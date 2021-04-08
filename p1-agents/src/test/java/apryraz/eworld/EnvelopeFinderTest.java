@@ -1,3 +1,5 @@
+package apryraz.eworld;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Level;
@@ -70,13 +72,13 @@ public class EnvelopeFinderTest {
     /**
      * Load a sequence of states from a file, and return the list
      *
-     * @param WDim       dimension of the world
+     * @param wDim       dimension of the world
      * @param numStates  num of states to read from the file
      * @param statesFile file name with sequence of target states, that should
      *                   be the resulting states after each movement in fileSteps
      * @return returns an ArrayList of TFState with the resulting list of states
      **/
-    ArrayList<TFState> loadListOfTargetStates(int wDim, int numStates, String statesFile) {
+    ArrayList<EFState> loadListOfTargetStates(int wDim, int numStates, String statesFile) {
 
         ArrayList<EFState> listOfStates = new ArrayList<EFState>(numStates);
 
@@ -112,7 +114,7 @@ public class EnvelopeFinderTest {
      * @param fileSteps     file name with sequence of steps to perform
      * @param fileStates    file name with sequence of target states, that should
      *                      be the resulting states after each movement in fileSteps
-     * @param fileEnvelopes
+     * @param fileEnvelopes file name of the envelopes
      **/
     public void testMakeSeqOfSteps(int wDim,
                                    int numSteps, String fileSteps, String fileStates,
@@ -129,8 +131,8 @@ public class EnvelopeFinderTest {
 
 
         // Set environment agent and load list of steps into the finder agent
-        eAgent.loadListOfSteps(numSteps, fileSteps);
-        eAgent.setEnvironment(envAgent);
+        // eAgent.loadListOfSteps(numSteps, fileSteps);
+        // eAgent.setEnvironment(envAgent);
 
         // Test here the sequence of steps and check the resulting states with the
         // ones in seqOfStates

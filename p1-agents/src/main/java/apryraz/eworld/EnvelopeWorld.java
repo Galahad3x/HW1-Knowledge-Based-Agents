@@ -28,18 +28,21 @@ public class EnvelopeWorld {
                                         int numSteps, String fileSteps, String fileEnvelopes) throws
             IOException, ContradictionException, TimeoutException {
         // Make instances of TreasureFinder agent and environment object classes
-        EnvelopeFinder EAgent;
-        EnvelopeWorldEnv EnvAgent;
+        EnvelopeFinder EAgent = new EnvelopeFinder(wDim);
+        EnvelopeWorldEnv EnvAgent = new EnvelopeWorldEnv(wDim, fileEnvelopes);
 
 
         // save environment object into EAgent
-
+        EAgent.setEnvironment(EnvAgent);
 
         // load list of steps into the Finder Agent
-
+        EAgent.loadListOfSteps(numSteps, fileSteps);
 
         // Execute sequence of steps with the Agent
         //TODO: Implementar programa principal (Anar pas per pas i fer les preguntes)
+        for (int i = 0; i < numSteps; i++) {
+            EAgent.runNextStep();
+        }
     }
 
     /**

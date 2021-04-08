@@ -171,10 +171,6 @@ public class EnvelopeFinder {
      **/
     public void runNextStep() throws
             IOException, ContradictionException, TimeoutException {
-        // Add the conclusions obtained in the previous step
-        // but as clauses that use the "past" variables
-        addLastFutureClausesToPastClauses();
-
         // Ask to move, and check whether it was successful
         // Also, record if a pirate was found at that position
         processMoveAnswer(moveToNext());
@@ -186,6 +182,10 @@ public class EnvelopeFinder {
         // of the Envelope World
         performInferenceQuestions();
         efstate.printState();      // Print the resulting knowledge matrix
+
+        // Add the conclusions obtained in the previous step
+        // but as clauses that use the "past" variables
+        addLastFutureClausesToPastClauses();
     }
 
 
@@ -317,6 +317,8 @@ public class EnvelopeFinder {
      **/
     public void performInferenceQuestions() throws IOException,
             ContradictionException, TimeoutException {
+        //TODO: Passar per totes les posicions del mapa i comprovar amb la formula si no son possibles
+
         // EXAMPLE code to check this for position (2,3):
         // Get variable number for position 2,3 in past variables
         int linealIndex = coordToLineal(2, 3, EnvelopeFutureOffset);
@@ -346,11 +348,11 @@ public class EnvelopeFinder {
      **/
     public ISolver buildGamma() throws UnsupportedEncodingException,
             FileNotFoundException, IOException, ContradictionException {
-        int totalNumVariables;
+        int totalNumVariables = this.WorldLinealDim;
 
         // You must set this variable to the total number of boolean variables
         // in your formula Gamma
-        // totalNumVariables =  ??
+        // totalNumVariables = this.WorldLinealDim
         solver = SolverFactory.newDefault();
         solver.setTimeout(3600);
         solver.newVar(totalNumVariables);
