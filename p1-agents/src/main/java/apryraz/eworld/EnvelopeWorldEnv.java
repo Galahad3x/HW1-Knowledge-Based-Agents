@@ -13,6 +13,11 @@ public class EnvelopeWorldEnv {
 
 
     /**
+     * ArrayList with the positions that have envelopes
+     */
+    ArrayList<Position> envelopePositions;
+
+    /**
      * Class constructor
      *
      * @param dim          dimension of the world
@@ -27,7 +32,7 @@ public class EnvelopeWorldEnv {
      * Load the list of pirates locations
      *
      * @param envelopeFile: name of the file that should contain a
-     * set of envelope locations in a single line.
+     *                      set of envelope locations in a single line.
      **/
     public void loadEnvelopeLocations(String envelopeFile) {
         // TODO: Carregar les localitzacions dels sobres al mapa
@@ -52,18 +57,43 @@ public class EnvelopeWorldEnv {
 
             if (withinLimits(nx, ny)) {
                 ans = new AMessage("movedto", msg.getComp(1), msg.getComp(2), "");
-            } else
+            } else {
                 ans = new AMessage("notmovedto", msg.getComp(1), msg.getComp(2), "");
+            }
+        } else if (msg.getComp(0).equals("detectsat")) {
+            int nx = Integer.parseInt(msg.getComp(1));
+            int ny = Integer.parseInt(msg.getComp(2));
 
-        } else {
-            // TODO: Fer que detecti altres tipus de missatge
-            // YOU MUST ANSWER HERE TO THE OTHER MESSAGE TYPE:
-            //   ( "detectsat", "x" , "y", "" )
-            //
+            String solutions = "";
+
+            if (hasEnvelope(nx + 1, ny - 1) || hasEnvelope(nx + 1, ny) || hasEnvelope(nx + 1, ny + 1)) {
+                solutions += "1";
+            }
+            if (hasEnvelope(nx + 1, ny + 1) || hasEnvelope(nx, ny + 1) || hasEnvelope(nx - 1, ny + 1)) {
+                solutions += "2";
+            }
+            if (hasEnvelope(nx - 1, ny - 1) || hasEnvelope(nx - 1, ny) || hasEnvelope(nx - 1, ny + 1)) {
+                solutions += "3";
+            }
+            if (hasEnvelope(nx + 1, ny - 1) || hasEnvelope(nx, ny - 1) || hasEnvelope(nx - 1, ny - 1)) {
+                solutions += "4";
+            }
+            if (hasEnvelope(nx, ny)) {
+                solutions += "5";
+            }
+            ans = new AMessage("detectedat", String.valueOf(nx), String.valueOf(ny), solutions);
         }
         return ans;
     }
 
+    private boolean hasEnvelope(int x, int y) {
+        for (Position pos : this.envelopePositions) {
+            if (pos.x == x && pos.y == y) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * Check if position x,y is within the limits of the

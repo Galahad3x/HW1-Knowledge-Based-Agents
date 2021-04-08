@@ -292,6 +292,9 @@ public class EnvelopeFinder {
         //TODO: LLegir el que ens passa el sensor i afegir clausules dels llocs on no és possible
     }
 
+    public void addClauseOfNotPossibleLocation(int x, int y) {
+
+    }
 
     /**
      * This function should add all the clauses stored in the list
@@ -319,6 +322,7 @@ public class EnvelopeFinder {
             ContradictionException, TimeoutException {
         //TODO: Passar per totes les posicions del mapa i comprovar amb la formula si no son possibles
 
+        /*
         // EXAMPLE code to check this for position (2,3):
         // Get variable number for position 2,3 in past variables
         int linealIndex = coordToLineal(2, 3, EnvelopeFutureOffset);
@@ -329,6 +333,7 @@ public class EnvelopeFinder {
         variablePositive.insertFirst(linealIndex);
 
         // Check if Gamma + variablePositive is unsatisfiable:
+        // If gamma + variablePositive is unsatisfiable it means that its possible than there is not an envelope in 2, 3
         // This is only AN EXAMPLE for a specific position: (2,3)
         if (!(solver.isSatisfiable(variablePositive))) {
             // Add conclusion to list, but rewritten with respect to "past" variables
@@ -337,6 +342,25 @@ public class EnvelopeFinder {
 
             futureToPast.add(concPast);
             efstate.set(2, 3, "X");
+        }
+        */
+        for (int i = 0; i < this.WorldDim; i++) {
+            for (int j = 0; j < this.WorldDim; j++) {
+                int variableEnFutur = coordToLineal(i + 1, j + 1, EnvelopeFutureOffset);
+                int variableEnPassat = coordToLineal(i + 1, j + 1, EnvelopePastOffset);
+
+                VecInt variablePositive = new VecInt();
+                variablePositive.insertFirst(variableEnFutur);
+
+                if (!(solver.isSatisfiable(variablePositive))) {
+                    // Add conclusion to list, but rewritten with respect to "past" variables
+                    VecInt concPast = new VecInt();
+                    concPast.insertFirst(-(variableEnPassat));
+
+                    futureToPast.add(concPast);
+                    efstate.set(i + 1, j + 1, "X");
+                }
+            }
         }
     }
 
@@ -348,6 +372,7 @@ public class EnvelopeFinder {
      **/
     public ISolver buildGamma() throws UnsupportedEncodingException,
             FileNotFoundException, IOException, ContradictionException {
+        //Number of positions in the map, that can have envelopes or not
         int totalNumVariables = this.WorldLinealDim;
 
         // You must set this variable to the total number of boolean variables
@@ -360,7 +385,7 @@ public class EnvelopeFinder {
         // the variable indentifiers of all the variables
         actualLiteral = 1;
 
-        // call here functions to add the differen sets of clauses
+        // call here functions to add the different sets of clauses
         // of Gamma to the solver object
         //
         // EXEMPLE of building a clause:
@@ -370,7 +395,7 @@ public class EnvelopeFinder {
         //
         //  Insert the clause into the formula:
         //  solver.addClause(Clause);
-
+        //TODO: Afegir alguns sets de clausules, pero quins?
 
         return solver;
     }
