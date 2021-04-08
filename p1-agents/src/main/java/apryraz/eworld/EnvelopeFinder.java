@@ -290,6 +290,16 @@ public class EnvelopeFinder {
 
         // CALL your functions HERE
         //TODO: LLegir el que ens passa el sensor i afegir clausules dels llocs on no és possible
+        if (detects.length() == 0) {
+            //Totes les adjacents no tenen sobre
+        } else {
+            for (int i = 0; i < detects.length(); i++) {
+                if ((int) detects.charAt(i) == 1) {
+                    // Vol dir que a les del 1 si que pot ser
+                }
+                //etc...
+            }
+        }
     }
 
     public void addClauseOfNotPossibleLocation(int x, int y) {

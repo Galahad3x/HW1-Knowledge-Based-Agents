@@ -39,7 +39,6 @@ public class EnvelopeWorld {
         EAgent.loadListOfSteps(numSteps, fileSteps);
 
         // Execute sequence of steps with the Agent
-        //TODO: Implementar programa principal (Anar pas per pas i fer les preguntes)
         for (int i = 0; i < numSteps; i++) {
             EAgent.runNextStep();
         }

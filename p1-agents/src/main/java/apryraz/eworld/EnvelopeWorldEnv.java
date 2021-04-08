@@ -35,7 +35,7 @@ public class EnvelopeWorldEnv {
      *                      set of envelope locations in a single line.
      **/
     public void loadEnvelopeLocations(String envelopeFile) {
-        // TODO: Carregar les localitzacions dels sobres al mapa
+        // TODO: Carregar les localitzacions dels sobres al arrayList
     }
 
 
@@ -66,27 +66,27 @@ public class EnvelopeWorldEnv {
 
             String solutions = "";
 
-            if (hasEnvelope(nx + 1, ny - 1) || hasEnvelope(nx + 1, ny) || hasEnvelope(nx + 1, ny + 1)) {
+            if (hasEnvelopeAt(nx + 1, ny - 1) || hasEnvelopeAt(nx + 1, ny) || hasEnvelopeAt(nx + 1, ny + 1)) {
                 solutions += "1";
             }
-            if (hasEnvelope(nx + 1, ny + 1) || hasEnvelope(nx, ny + 1) || hasEnvelope(nx - 1, ny + 1)) {
+            if (hasEnvelopeAt(nx + 1, ny + 1) || hasEnvelopeAt(nx, ny + 1) || hasEnvelopeAt(nx - 1, ny + 1)) {
                 solutions += "2";
             }
-            if (hasEnvelope(nx - 1, ny - 1) || hasEnvelope(nx - 1, ny) || hasEnvelope(nx - 1, ny + 1)) {
+            if (hasEnvelopeAt(nx - 1, ny - 1) || hasEnvelopeAt(nx - 1, ny) || hasEnvelopeAt(nx - 1, ny + 1)) {
                 solutions += "3";
             }
-            if (hasEnvelope(nx + 1, ny - 1) || hasEnvelope(nx, ny - 1) || hasEnvelope(nx - 1, ny - 1)) {
+            if (hasEnvelopeAt(nx + 1, ny - 1) || hasEnvelopeAt(nx, ny - 1) || hasEnvelopeAt(nx - 1, ny - 1)) {
                 solutions += "4";
             }
-            if (hasEnvelope(nx, ny)) {
+            if (hasEnvelopeAt(nx, ny)) {
                 solutions += "5";
             }
-            ans = new AMessage("detectedat", String.valueOf(nx), String.valueOf(ny), solutions);
+            ans = new AMessage("detectedat", solutions, String.valueOf(nx), String.valueOf(ny));
         }
         return ans;
     }
 
-    private boolean hasEnvelope(int x, int y) {
+    private boolean hasEnvelopeAt(int x, int y) {
         for (Position pos : this.envelopePositions) {
             if (pos.x == x && pos.y == y) {
                 return true;
