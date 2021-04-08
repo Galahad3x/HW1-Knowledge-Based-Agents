@@ -89,14 +89,11 @@ public class EnvelopeFinder {
      * @param WDim the dimension of the Envelope World
      **/
     public EnvelopeFinder(int WDim) {
-
         WorldDim = WDim;
         WorldLinealDim = WorldDim * WorldDim;
 
         try {
             solver = buildGamma();
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(EnvelopeFinder.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException | ContradictionException ex) {
             Logger.getLogger(EnvelopeFinder.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -118,7 +115,6 @@ public class EnvelopeFinder {
      * @param environment the Environment object
      **/
     public void setEnvironment(EnvelopeWorldEnv environment) {
-
         EnvAgent = environment;
     }
 
@@ -148,7 +144,7 @@ public class EnvelopeFinder {
             exit(2);
         }
         stepsList = steps.split(" ");
-        listOfSteps = new ArrayList<Position>(numSteps);
+        listOfSteps = new ArrayList<>(numSteps);
         for (int i = 0; i < numSteps; i++) {
             String[] coords = stepsList[i].split(",");
             listOfSteps.add(new Position(Integer.parseInt(coords[0]), Integer.parseInt(coords[1])));
@@ -175,7 +171,6 @@ public class EnvelopeFinder {
      **/
     public void runNextStep() throws
             IOException, ContradictionException, TimeoutException {
-
         // Add the conclusions obtained in the previous step
         // but as clauses that use the "past" variables
         addLastFutureClausesToPastClauses();
@@ -184,10 +179,8 @@ public class EnvelopeFinder {
         // Also, record if a pirate was found at that position
         processMoveAnswer(moveToNext());
 
-
         // Next, use Detector sensor to discover new information
         processDetectorSensorAnswer(DetectsAt());
-
 
         // Perform logical consequence questions for all the positions
         // of the Envelope World
@@ -213,7 +206,7 @@ public class EnvelopeFinder {
             return moveTo(nextPosition.x, nextPosition.y);
         } else {
             System.out.println("NO MORE steps to perform at agent!");
-            return (new AMessage("NOMESSAGE", "", ""));
+            return (new AMessage("NOMESSAGE", "", "", ""));
         }
     }
 
@@ -232,7 +225,7 @@ public class EnvelopeFinder {
         // Tell the EnvironmentAgentID that we want  to move
         AMessage msg, ans;
 
-        msg = new AMessage("moveto", (new Integer(x)).toString(), (new Integer(y)).toString(), "");
+        msg = new AMessage("moveto", (Integer.valueOf(x)).toString(), (Integer.valueOf(y)).toString(), "");
         ans = EnvAgent.acceptMessage(msg);
         System.out.println("FINDER => moving to : (" + x + "," + y + ")");
 
@@ -250,7 +243,7 @@ public class EnvelopeFinder {
             agentX = Integer.parseInt(moveans.getComp(1));
             agentY = Integer.parseInt(moveans.getComp(2));
 
-            System.out.println("FINDER => moved to : (" + agentX + "," + agentY + ")" + " Pirate found : " + pirateFound);
+            System.out.println("FINDER => moved to : (" + agentX + "," + agentY + ")");
         }
     }
 
@@ -263,8 +256,8 @@ public class EnvelopeFinder {
     public AMessage DetectsAt() {
         AMessage msg, ans;
 
-        msg = new AMessage("detectsat", (new Integer(agentX)).toString(),
-                (new Integer(agentY)).toString(), "");
+        msg = new AMessage("detectsat", (Integer.valueOf(agentX)).toString(),
+                (Integer.valueOf(agentY)).toString(), "");
         ans = EnvAgent.acceptMessage(msg);
         System.out.println("FINDER => detecting at : (" + agentX + "," + agentY + ")");
         return ans;
@@ -295,8 +288,8 @@ public class EnvelopeFinder {
         // of the agent) and the past is consistent with the future in your Gamma
         // formula
 
-
         // CALL your functions HERE
+        //TODO: LLegir el que ens passa el sensor i afegir clausules dels llocs on no és possible
     }
 
 
@@ -307,8 +300,7 @@ public class EnvelopeFinder {
      **/
     public void addLastFutureClausesToPastClauses() throws IOException,
             ContradictionException, TimeoutException {
-
-
+        //TODO: Afegir les clausules futures a les passades (la memoria de l'agent)
     }
 
     /**
@@ -344,7 +336,6 @@ public class EnvelopeFinder {
             futureToPast.add(concPast);
             efstate.set(2, 3, "X");
         }
-
     }
 
     /**

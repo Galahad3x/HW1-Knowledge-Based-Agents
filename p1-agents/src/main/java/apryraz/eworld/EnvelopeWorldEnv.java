@@ -19,7 +19,6 @@ public class EnvelopeWorldEnv {
      * @param envelopeFile File with list of envelopes locations
      **/
     public EnvelopeWorldEnv(int dim, String envelopeFile) {
-
         WorldDim = dim;
         loadEnvelopeLocations(envelopeFile);
     }
@@ -27,12 +26,11 @@ public class EnvelopeWorldEnv {
     /**
      * Load the list of pirates locations
      *
-     * @param: name of the file that should contain a
+     * @param envelopeFile: name of the file that should contain a
      * set of envelope locations in a single line.
      **/
     public void loadEnvelopeLocations(String envelopeFile) {
-
-
+        // TODO: Carregar les localitzacions dels sobres al mapa
     }
 
 
@@ -53,19 +51,17 @@ public class EnvelopeWorldEnv {
             int ny = Integer.parseInt(msg.getComp(2));
 
             if (withinLimits(nx, ny)) {
-
-
-                ans = new AMessage("movedto", msg.getComp(1), msg.getComp(2));
+                ans = new AMessage("movedto", msg.getComp(1), msg.getComp(2), "");
             } else
                 ans = new AMessage("notmovedto", msg.getComp(1), msg.getComp(2), "");
 
         } else {
+            // TODO: Fer que detecti altres tipus de missatge
             // YOU MUST ANSWER HERE TO THE OTHER MESSAGE TYPE:
             //   ( "detectsat", "x" , "y", "" )
             //
         }
         return ans;
-
     }
 
 
@@ -78,7 +74,6 @@ public class EnvelopeWorldEnv {
      * @return true if (x,y) is within the limits of the world
      **/
     public boolean withinLimits(int x, int y) {
-
         return (x >= 1 && x <= WorldDim && y >= 1 && y <= WorldDim);
     }
 

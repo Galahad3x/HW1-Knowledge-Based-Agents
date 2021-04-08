@@ -25,7 +25,6 @@ public class EFState {
     /* i is the row, j the column
        we assume i and j are given in the range [1,wDim] */
     public void set(int i, int j, String val) {
-
         matrix[i - 1][j - 1] = val;
     }
 
@@ -35,8 +34,10 @@ public class EFState {
 
         for (int i = 0; i < wDim; i++) {
             for (int j = 0; j < wDim; j++) {
-                if (!matrix[i][j].equals(efstate2.matrix[i][j]))
+                if (!matrix[i][j].equals(efstate2.matrix[i][j])) {
                     status = false;
+                    break;
+                }
             }
         }
 

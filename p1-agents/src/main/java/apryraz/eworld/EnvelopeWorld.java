@@ -39,7 +39,7 @@ public class EnvelopeWorld {
 
 
         // Execute sequence of steps with the Agent
-
+        //TODO: Implementar programa principal (Anar pas per pas i fer les preguntes)
     }
 
     /**
@@ -54,6 +54,7 @@ public class EnvelopeWorld {
 
         // Here I run a concrete example, but you should read parameters from
         // the command line, as decribed above.
+        //TODO: Llegir paràmetres de la terminal
         runStepsSequence(4, 5, "tests/steps1.txt", "tests/envelopes1.txt");
     }
 
