@@ -1,60 +1,57 @@
 package apryraz.eworld;
 
 public class EFState {
-  /**
+    /**
+     *
+     **/
 
+    int wDim;
+    String[][] matrix;
 
-  **/
+    public EFState(int dim) {
+        wDim = dim;
+        matrix = new String[wDim][wDim];
+        initializeState();
+    }
 
-  int wDim;
-  String [][] matrix;
+    public void initializeState() {
+        for (int i = 0; i < wDim; i++) {
+            for (int j = 0; j < wDim; j++) {
+                matrix[i][j] = "?";
+            }
+        }
+    }
 
-  public EFState( int dim ) {
-    wDim = dim;
-    matrix = new String[wDim][wDim];
-    initializeState();
-  }
+    /* i is the row, j the column
+       we assume i and j are given in the range [1,wDim] */
+    public void set(int i, int j, String val) {
 
-  public void initializeState()
-  {
-      for (int i = 0; i < wDim; i++) {
-          for (int j = 0; j < wDim; j++) {
-              matrix[i][j] = "?";
-          }
-      }
-  }
+        matrix[i - 1][j - 1] = val;
+    }
 
-  /* i is the row, j the column
-     we assume i and j are given in the range [1,wDim] */
-  public void set( int i, int j, String val ) {
+    public boolean equals(Object obj) {
+        EFState efstate2 = (EFState) obj;
+        boolean status = true;
 
-         matrix[i-1][j-1] = val;
-  }
+        for (int i = 0; i < wDim; i++) {
+            for (int j = 0; j < wDim; j++) {
+                if (!matrix[i][j].equals(efstate2.matrix[i][j]))
+                    status = false;
+            }
+        }
 
-  public boolean equals(Object obj){
-       EFState efstate2 = (EFState) obj;
-       boolean status = true;
+        return status;
+    }
 
-       for (int i = 0; i < wDim; i++) {
-           for (int j = 0; j < wDim; j++) {
-               if (! matrix[i][j].equals( efstate2.matrix[i][j]) )
-                 status = false;
-           }
-       }
-
-       return status;
-   }
-
-  public void printState()
-  {
-      System.out.println("FINDER => Printing Envelope world matrix");
-      for (int i = wDim-1; i > -1; i--) {
-          System.out.print("\t#\t");
-          for (int j = 0; j < wDim; j++) {
-              System.out.print(matrix[i][j] + " ");
-          }
-          System.out.println("\t#");
-      }
-  }
+    public void printState() {
+        System.out.println("FINDER => Printing Envelope world matrix");
+        for (int i = wDim - 1; i > -1; i--) {
+            System.out.print("\t#\t");
+            for (int j = 0; j < wDim; j++) {
+                System.out.print(matrix[i][j] + " ");
+            }
+            System.out.println("\t#");
+        }
+    }
 
 }
