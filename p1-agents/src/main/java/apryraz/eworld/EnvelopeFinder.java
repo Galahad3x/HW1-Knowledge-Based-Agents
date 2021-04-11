@@ -76,7 +76,9 @@ public class EnvelopeFinder {
     /**
      * ArrayList where we will save the detector answer
      */
-    ArrayList<Position> possibles;
+    ArrayList<Position> impossiblesBoxes;
+    ArrayList<Position> possiblesBoxes;
+
 
     /**
      * This set of variables CAN be use to mark the beginning of different sets
@@ -293,11 +295,12 @@ public class EnvelopeFinder {
         // formula
 
         // CALL your functions HERE
-        possibles = new ArrayList<>();
+        impossiblesBoxes = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 if (this.EnvAgent.withinLimits(x - 1 + i, y - 1 + j)) {
-                    possibles.add(new Position(x - 1 + i, y - 1 + j));
+                    impossiblesBoxes.add(new Position(x - 1 + i, y - 1 + j));
+                    possiblesBoxes.add(new Position(x - 1 + i, y - 1 + j));
                 }
             }
         }
@@ -306,47 +309,50 @@ public class EnvelopeFinder {
             switch (detects.charAt(i)){
                 case 1:
                 for (int j = 0; j < 3; j++) {
-                    for (Position pos : possibles) {
+                    for (Position pos : impossiblesBoxes) {
                         if (pos.x == x + 1 && pos.y == y - 1 + j) {
-                            possibles.remove(pos);
+                            impossiblesBoxes.remove(pos);
                             break;
                         }
                     }
                 }
                 case 2:
                 for (int ii = 0; ii < 3; ii++) {
-                    for (Position pos : possibles) {
+                    for (Position pos : impossiblesBoxes) {
                         if (pos.x == x - 1 + ii && pos.y == y + 1) {
-                            possibles.remove(pos);
+                            impossiblesBoxes.remove(pos);
                             break;
                         }
                     }
                 }
                 case 3:
                 for (int j = 0; j < 3; j++) {
-                    for (Position pos : possibles) {
+                    for (Position pos : impossiblesBoxes) {
                         if (pos.x == x - 1 && pos.y == y - 1 + j) {
-                            possibles.remove(pos);
+                            impossiblesBoxes.remove(pos);
                             break;
                         }
                     }
                 }
                 case 4:
                 for (int ii = 0; ii < 3; ii++) {
-                    for (Position pos : possibles) {
+                    for (Position pos : impossiblesBoxes) {
                         if (pos.x == x - 1 + ii && pos.y == y - 1) {
-                            possibles.remove(pos);
+                            impossiblesBoxes.remove(pos);
                             break;
                         }
                     }
                 }
                 case 5:
-                for (Position pos : possibles) {
+                for (Position pos : impossiblesBoxes) {
                     if (pos.x == x && pos.y == y) {
-                        possibles.remove(pos);
+                        impossiblesBoxes.remove(pos);
                         break;
                     }
                 }
+            }
+            for (Position pos: impossiblesBoxes) {
+                possiblesBoxes.remove(pos);
             }
         }
         //Possibles es les posicions on SEGUR que no hi ha sobre
@@ -360,10 +366,8 @@ public class EnvelopeFinder {
     public void addLastFutureClausesToPastClauses() throws IOException,
             ContradictionException, TimeoutException {
         //TODO: Afegir les clausules futures a les passades (la memoria de l'agent)
-        // Mira si les posicions del futur son possibles, si no ho son, insereix aquestes posicions
-        // a la futureToPast list fent servir les variables del passat de la mateixa posició.
-        // Per a fer-ho més eficient hem de comprovar si aquesta posició p que volem afegir, ja esta afegida. Si es així
-        // no cal afegir-la.
+        // Afegir a futureToPast a través de VecInt
+
     }
 
     /**
@@ -405,7 +409,11 @@ public class EnvelopeFinder {
         */
 
         //TODO
-        for (Position pos : possibles) {
+        // Mira si les posicions del futur son possibles, si no ho son, insereix aquestes posicions
+        // a la futureToPast list fent servir les variables del passat de la mateixa posició.
+        // Per a fer-ho més eficient hem de comprovar si aquesta posició p que volem afegir, ja esta afegida. Si es així
+        // no cal afegir-la.
+        for (Position pos : impossiblesBoxes) {
             int variableEnFutur = coordToLineal(pos.x, pos.y, EnvelopeFutureOffset);
             int variableEnPassat = coordToLineal(pos.x, pos.y, EnvelopePastOffset);
 
