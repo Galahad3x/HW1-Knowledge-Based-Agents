@@ -1,5 +1,3 @@
-
-
 package apryraz.eworld;
 
 import java.lang.reflect.Array;
@@ -25,7 +23,6 @@ import org.sat4j.specs.*;
 import org.sat4j.minisat.*;
 import org.sat4j.reader.*;
 
-
 /**
  * This agent performs a sequence of movements, and after each
  * movement it "senses" from the evironment the resulting position
@@ -33,39 +30,44 @@ import org.sat4j.reader.*;
  * the position of Envelope
  **/
 public class EnvelopeFinder {
-
-
     /**
      * The list of steps to perform
      **/
     ArrayList<Position> listOfSteps;
+
     /**
      * index to the next movement to perform, and total number of movements
      **/
     int idNextStep, numMovements;
+
     /**
      * Array of clauses that represent conclusiones obtained in the last
      * call to the inference function, but rewritten using the "past" variables
      **/
     ArrayList<VecInt> futureToPast = null;
+
     /**
      * the current state of knowledge of the agent (what he knows about
      * every position of the world)
      **/
     EFState efstate;
+
     /**
      * The object that represents the interface to the Envelope World
      **/
     EnvelopeWorldEnv EnvAgent;
+
     /**
      * SAT solver object that stores the logical boolean formula with the rules
      * and current knowledge about not possible locations for Envelope
      **/
     ISolver solver;
+
     /**
      * Agent position in the world
      **/
     int agentX, agentY;
+
     /**
      * Dimension of the world and total size of the world (Dim^2)
      **/
@@ -85,7 +87,6 @@ public class EnvelopeFinder {
     int EnvelopeFutureOffset;
     int DetectorOffset;
     int actualLiteral;
-
 
     /**
      * The class constructor must create the initial Boolean formula with the
@@ -123,7 +124,6 @@ public class EnvelopeFinder {
     public void setEnvironment(EnvelopeWorldEnv environment) {
         EnvAgent = environment;
     }
-
 
     /**
      * Load a sequence of steps to be performed by the agent. This sequence will
@@ -193,7 +193,6 @@ public class EnvelopeFinder {
         // but as clauses that use the "past" variables
         addLastFutureClausesToPastClauses();
     }
-
 
     /**
      * Ask the agent to move to the next position, by sending an appropriate
@@ -269,7 +268,6 @@ public class EnvelopeFinder {
         return ans;
     }
 
-
     /**
      * Process the answer obtained for the query "Detects at (x,y)?"
      * by adding the appropriate evidence clause to the formula
@@ -305,7 +303,8 @@ public class EnvelopeFinder {
         }
         // Possibles es totes les posicions on detecte el sensor
         for (int i = 0; i < detects.length(); i++) {
-            if ((int) detects.charAt(i) == 1) {
+            switch (detects.charAt(i)){
+                case 1:
                 for (int j = 0; j < 3; j++) {
                     for (Position pos : possibles) {
                         if (pos.x == x + 1 && pos.y == y - 1 + j) {
@@ -314,7 +313,7 @@ public class EnvelopeFinder {
                         }
                     }
                 }
-            } else if ((int) detects.charAt(i) == 2) {
+                case 2:
                 for (int ii = 0; ii < 3; ii++) {
                     for (Position pos : possibles) {
                         if (pos.x == x - 1 + ii && pos.y == y + 1) {
@@ -323,7 +322,7 @@ public class EnvelopeFinder {
                         }
                     }
                 }
-            } else if ((int) detects.charAt(i) == 3) {
+                case 3:
                 for (int j = 0; j < 3; j++) {
                     for (Position pos : possibles) {
                         if (pos.x == x - 1 && pos.y == y - 1 + j) {
@@ -332,7 +331,7 @@ public class EnvelopeFinder {
                         }
                     }
                 }
-            } else if ((int) detects.charAt(i) == 4) {
+                case 4:
                 for (int ii = 0; ii < 3; ii++) {
                     for (Position pos : possibles) {
                         if (pos.x == x - 1 + ii && pos.y == y - 1) {
@@ -341,7 +340,7 @@ public class EnvelopeFinder {
                         }
                     }
                 }
-            } else if ((int) detects.charAt(i) == 5) {
+                case 5:
                 for (Position pos : possibles) {
                     if (pos.x == x && pos.y == y) {
                         possibles.remove(pos);
@@ -361,6 +360,10 @@ public class EnvelopeFinder {
     public void addLastFutureClausesToPastClauses() throws IOException,
             ContradictionException, TimeoutException {
         //TODO: Afegir les clausules futures a les passades (la memoria de l'agent)
+        // Mira si les posicions del futur son possibles, si no ho son, insereix aquestes posicions
+        // a la futureToPast list fent servir les variables del passat de la mateixa posició.
+        // Per a fer-ho més eficient hem de comprovar si aquesta posició p que volem afegir, ja esta afegida. Si es així
+        // no cal afegir-la.
     }
 
     /**
@@ -400,6 +403,8 @@ public class EnvelopeFinder {
             efstate.set(2, 3, "X");
         }
         */
+
+        //TODO
         for (Position pos : possibles) {
             int variableEnFutur = coordToLineal(pos.x, pos.y, EnvelopeFutureOffset);
             int variableEnPassat = coordToLineal(pos.x, pos.y, EnvelopePastOffset);
@@ -454,7 +459,6 @@ public class EnvelopeFinder {
         return solver;
     }
 
-
     /**
      * Convert a coordinate pair (x,y) to the integer value  t_[x,y]
      * of variable that stores that information in the formula, using
@@ -489,6 +493,4 @@ public class EnvelopeFinder {
         coords[0] = (lineal - 1) / WorldDim + 1;
         return coords;
     }
-
-
 }

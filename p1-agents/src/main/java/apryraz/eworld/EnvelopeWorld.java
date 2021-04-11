@@ -1,18 +1,15 @@
 package apryraz.eworld;
 
-
 import java.io.IOException;
 
 import org.sat4j.specs.*;
 import org.sat4j.minisat.*;
 import org.sat4j.reader.*;
 
-
 /**
  * The class for the main program of the Barcenas World
  **/
 public class EnvelopeWorld {
-
 
     /**
      * This function should execute the sequence of steps stored in the file fileSteps,
@@ -59,5 +56,4 @@ public class EnvelopeWorld {
         //TODO: Llegir paràmetres de la terminal
         runStepsSequence(5, 5, "/home/joel/Escriptori/APR/HW1-Knowledge-Based-Agents/p1-agents/tests/steps1.txt", "/home/joel/Escriptori/APR/HW1-Knowledge-Based-Agents/p1-agents/tests/envelopes1.txt");
     }
-
 }

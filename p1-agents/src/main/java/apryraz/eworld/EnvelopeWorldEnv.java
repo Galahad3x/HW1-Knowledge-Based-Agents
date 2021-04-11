@@ -1,5 +1,3 @@
-
-
 package apryraz.eworld;
 
 import java.io.BufferedReader;
@@ -12,13 +10,11 @@ import java.util.logging.Logger;
 
 import static java.lang.System.exit;
 
-
 public class EnvelopeWorldEnv {
     /**
      * world dimension
      **/
     int WorldDim;
-
 
     /**
      * ArrayList with the positions that have envelopes
@@ -64,7 +60,6 @@ public class EnvelopeWorldEnv {
             envelopePositions.add(new Position(Integer.parseInt(coords[0]), Integer.parseInt(coords[1])));
         }
     }
-
 
     /**
      * Process a message received by the EFinder agent,
@@ -133,5 +128,4 @@ public class EnvelopeWorldEnv {
     public boolean withinLimits(int x, int y) {
         return (x >= 1 && x <= WorldDim && y >= 1 && y <= WorldDim);
     }
-
 }

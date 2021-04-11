@@ -47,5 +47,4 @@ public class AMessage {
     public String getComp(int c) {
         return msg[c];
     }
-
 }
