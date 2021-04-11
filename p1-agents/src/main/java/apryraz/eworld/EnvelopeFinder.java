@@ -2,6 +2,7 @@
 
 package apryraz.eworld;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import java.io.BufferedReader;
@@ -69,6 +70,11 @@ public class EnvelopeFinder {
      * Dimension of the world and total size of the world (Dim^2)
      **/
     int WorldDim, WorldLinealDim;
+
+    /**
+     * ArrayList where we will save the detector answer
+     */
+    ArrayList<Position> possibles;
 
     /**
      * This set of variables CAN be use to mark the beginning of different sets
@@ -289,21 +295,62 @@ public class EnvelopeFinder {
         // formula
 
         // CALL your functions HERE
-        //TODO: LLegir el que ens passa el sensor i afegir clausules dels llocs on no és possible
-        if (detects.length() == 0) {
-            //Totes les adjacents no tenen sobre
-        } else {
-            for (int i = 0; i < detects.length(); i++) {
-                if ((int) detects.charAt(i) == 1) {
-                    // Vol dir que a les del 1 si que pot ser
+        possibles = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (this.EnvAgent.withinLimits(x - 1 + i, y - 1 + j)) {
+                    possibles.add(new Position(x - 1 + i, y - 1 + j));
                 }
-                //etc...
             }
         }
-    }
-
-    public void addClauseOfNotPossibleLocation(int x, int y) {
-
+        // Possibles es totes les posicions on detecte el sensor
+        for (int i = 0; i < detects.length(); i++) {
+            if ((int) detects.charAt(i) == 1) {
+                for (int j = 0; j < 3; j++) {
+                    for (Position pos : possibles) {
+                        if (pos.x == x + 1 && pos.y == y - 1 + j) {
+                            possibles.remove(pos);
+                            break;
+                        }
+                    }
+                }
+            } else if ((int) detects.charAt(i) == 2) {
+                for (int ii = 0; ii < 3; ii++) {
+                    for (Position pos : possibles) {
+                        if (pos.x == x - 1 + ii && pos.y == y + 1) {
+                            possibles.remove(pos);
+                            break;
+                        }
+                    }
+                }
+            } else if ((int) detects.charAt(i) == 3) {
+                for (int j = 0; j < 3; j++) {
+                    for (Position pos : possibles) {
+                        if (pos.x == x - 1 && pos.y == y - 1 + j) {
+                            possibles.remove(pos);
+                            break;
+                        }
+                    }
+                }
+            } else if ((int) detects.charAt(i) == 4) {
+                for (int ii = 0; ii < 3; ii++) {
+                    for (Position pos : possibles) {
+                        if (pos.x == x - 1 + ii && pos.y == y - 1) {
+                            possibles.remove(pos);
+                            break;
+                        }
+                    }
+                }
+            } else if ((int) detects.charAt(i) == 5) {
+                for (Position pos : possibles) {
+                    if (pos.x == x && pos.y == y) {
+                        possibles.remove(pos);
+                        break;
+                    }
+                }
+            }
+        }
+        //Possibles es les posicions on SEGUR que no hi ha sobre
     }
 
     /**
@@ -330,7 +377,6 @@ public class EnvelopeFinder {
      **/
     public void performInferenceQuestions() throws IOException,
             ContradictionException, TimeoutException {
-        //TODO: Passar per totes les posicions del mapa i comprovar amb la formula si no son possibles
 
         /*
         // EXAMPLE code to check this for position (2,3):
@@ -354,22 +400,20 @@ public class EnvelopeFinder {
             efstate.set(2, 3, "X");
         }
         */
-        for (int i = 0; i < this.WorldDim; i++) {
-            for (int j = 0; j < this.WorldDim; j++) {
-                int variableEnFutur = coordToLineal(i + 1, j + 1, EnvelopeFutureOffset);
-                int variableEnPassat = coordToLineal(i + 1, j + 1, EnvelopePastOffset);
+        for (Position pos : possibles) {
+            int variableEnFutur = coordToLineal(pos.x, pos.y, EnvelopeFutureOffset);
+            int variableEnPassat = coordToLineal(pos.x, pos.y, EnvelopePastOffset);
 
-                VecInt variablePositive = new VecInt();
-                variablePositive.insertFirst(variableEnFutur);
+            VecInt variablePositive = new VecInt();
+            variablePositive.insertFirst(variableEnFutur);
 
-                if (!(solver.isSatisfiable(variablePositive))) {
-                    // Add conclusion to list, but rewritten with respect to "past" variables
-                    VecInt concPast = new VecInt();
-                    concPast.insertFirst(-(variableEnPassat));
+            if (!(solver.isSatisfiable(variablePositive))) {
+                // Add conclusion to list, but rewritten with respect to "past" variables
+                VecInt concPast = new VecInt();
+                concPast.insertFirst(-(variableEnPassat));
 
-                    futureToPast.add(concPast);
-                    efstate.set(i + 1, j + 1, "X");
-                }
+                futureToPast.add(concPast);
+                efstate.set(pos.x, pos.y, "X");
             }
         }
     }

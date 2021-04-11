@@ -57,7 +57,7 @@ public class EnvelopeWorld {
         // Here I run a concrete example, but you should read parameters from
         // the command line, as decribed above.
         //TODO: Llegir paràmetres de la terminal
-        runStepsSequence(4, 5, "tests/steps1.txt", "tests/envelopes1.txt");
+        runStepsSequence(5, 5, "/home/joel/Escriptori/APR/HW1-Knowledge-Based-Agents/p1-agents/tests/steps1.txt", "/home/joel/Escriptori/APR/HW1-Knowledge-Based-Agents/p1-agents/tests/envelopes1.txt");
     }
 
 }
