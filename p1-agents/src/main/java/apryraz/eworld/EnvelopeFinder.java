@@ -44,7 +44,7 @@ public class EnvelopeFinder {
      * Array of clauses that represent conclusiones obtained in the last
      * call to the inference function, but rewritten using the "past" variables
      **/
-    ArrayList<VecInt> futureToPast = null;
+    ArrayList<VecInt> futureToPast = new ArrayList<>();
 
     /**
      * the current state of knowledge of the agent (what he knows about
@@ -110,6 +110,8 @@ public class EnvelopeFinder {
         idNextStep = 0;
         System.out.println("STARTING Envelope FINDER AGENT...");
 
+        EnvelopePastOffset = 1;
+        EnvelopeFutureOffset = WorldLinealDim + 2;
 
         efstate = new EFState(WorldDim);  // Initialize state (matrix) of knowledge with '?'
         efstate.printState();
@@ -179,6 +181,10 @@ public class EnvelopeFinder {
      **/
     public void runNextStep() throws
             IOException, ContradictionException, TimeoutException {
+        // Add the conclusions obtained in the previous step
+        // but as clauses that use the "past" variables
+        addLastFutureClausesToPastClauses();
+
         // Ask to move, and check whether it was successful
         // Also, record if a pirate was found at that position
         processMoveAnswer(moveToNext());
@@ -190,10 +196,6 @@ public class EnvelopeFinder {
         // of the Envelope World
         performInferenceQuestions();
         efstate.printState();      // Print the resulting knowledge matrix
-
-        // Add the conclusions obtained in the previous step
-        // but as clauses that use the "past" variables
-        addLastFutureClausesToPastClauses();
     }
 
     /**
@@ -287,6 +289,7 @@ public class EnvelopeFinder {
         int y = Integer.parseInt(ans.getComp(2));
         String detects = ans.getComp(0);
 
+        System.out.println("DETECTED " + detects);
         // Call your function/functions to add the evidence clauses
         // to Gamma to then be able to infer new NOT possible positions
         // This new evidences could be removed at the end of the current step,
@@ -296,6 +299,7 @@ public class EnvelopeFinder {
 
         // CALL your functions HERE
         impossiblesBoxes = new ArrayList<>();
+        possiblesBoxes = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 if (this.EnvAgent.withinLimits(x - 1 + i, y - 1 + j)) {
@@ -306,8 +310,8 @@ public class EnvelopeFinder {
         }
         // Possibles es totes les posicions on detecte el sensor
         for (int i = 0; i < detects.length(); i++) {
-            switch (detects.charAt(i)){
-                case 1:
+            System.out.println(((int) detects.charAt(i)) == 1);
+            if ((int) detects.charAt(i) == 1) {
                 for (int j = 0; j < 3; j++) {
                     for (Position pos : impossiblesBoxes) {
                         if (pos.x == x + 1 && pos.y == y - 1 + j) {
@@ -316,7 +320,7 @@ public class EnvelopeFinder {
                         }
                     }
                 }
-                case 2:
+            } else if (detects.charAt(i) == 2) {
                 for (int ii = 0; ii < 3; ii++) {
                     for (Position pos : impossiblesBoxes) {
                         if (pos.x == x - 1 + ii && pos.y == y + 1) {
@@ -325,7 +329,7 @@ public class EnvelopeFinder {
                         }
                     }
                 }
-                case 3:
+            } else if (detects.charAt(i) == 3) {
                 for (int j = 0; j < 3; j++) {
                     for (Position pos : impossiblesBoxes) {
                         if (pos.x == x - 1 && pos.y == y - 1 + j) {
@@ -334,7 +338,7 @@ public class EnvelopeFinder {
                         }
                     }
                 }
-                case 4:
+            } else if (detects.charAt(i) == 4) {
                 for (int ii = 0; ii < 3; ii++) {
                     for (Position pos : impossiblesBoxes) {
                         if (pos.x == x - 1 + ii && pos.y == y - 1) {
@@ -343,7 +347,7 @@ public class EnvelopeFinder {
                         }
                     }
                 }
-                case 5:
+            } else if (detects.charAt(i) == 5) {
                 for (Position pos : impossiblesBoxes) {
                     if (pos.x == x && pos.y == y) {
                         impossiblesBoxes.remove(pos);
@@ -351,11 +355,18 @@ public class EnvelopeFinder {
                     }
                 }
             }
-            for (Position pos: impossiblesBoxes) {
+            for (Position pos : impossiblesBoxes) {
                 possiblesBoxes.remove(pos);
             }
         }
-        //Possibles es les posicions on SEGUR que no hi ha sobre
+        //Impossibles es les posicions on SEGUR que no hi ha sobre
+        for (Position pos : impossiblesBoxes) {
+            int variableEnFutur = coordToLineal(pos.x, pos.y, EnvelopeFutureOffset);
+            VecInt clausula = new VecInt();
+            clausula.insertFirst(-variableEnFutur); // -e x,y t+1
+            solver.addClause(clausula);
+            System.out.println("ADDED TO FORMULA: -e " + pos.x + " " + pos.y);
+        }
     }
 
     /**
@@ -365,9 +376,10 @@ public class EnvelopeFinder {
      **/
     public void addLastFutureClausesToPastClauses() throws IOException,
             ContradictionException, TimeoutException {
-        //TODO: Afegir les clausules futures a les passades (la memoria de l'agent)
-        // Afegir a futureToPast a través de VecInt
-
+        for (VecInt vec : futureToPast) {
+            solver.addClause(vec);
+        }
+        futureToPast = new ArrayList<>();
     }
 
     /**
@@ -396,7 +408,6 @@ public class EnvelopeFinder {
         variablePositive.insertFirst(linealIndex);
 
         // Check if Gamma + variablePositive is unsatisfiable:
-        // If gamma + variablePositive is unsatisfiable it means that its possible than there is not an envelope in 2, 3
         // This is only AN EXAMPLE for a specific position: (2,3)
         if (!(solver.isSatisfiable(variablePositive))) {
             // Add conclusion to list, but rewritten with respect to "past" variables
@@ -413,22 +424,42 @@ public class EnvelopeFinder {
         // a la futureToPast list fent servir les variables del passat de la mateixa posició.
         // Per a fer-ho més eficient hem de comprovar si aquesta posició p que volem afegir, ja esta afegida. Si es així
         // no cal afegir-la.
+        for (int i = 1; i < EnvAgent.WorldDim + 1; i++) {
+            for (int j = 1; j < EnvAgent.WorldDim + 1; j++) {
+                int variableEnFutur = coordToLineal(i, j, EnvelopeFutureOffset);
+                int variableEnPassat = coordToLineal(i, j, EnvelopePastOffset);
+
+                VecInt variableNegative = new VecInt();
+                variableNegative.insertFirst(variableEnFutur); // -e x,y t+1
+
+                if (!(solver.isSatisfiable(variableNegative))) {
+                    // Add conclusion to list, but rewritten with respect to "past" variables
+                    VecInt concPast = new VecInt();
+                    concPast.insertFirst(-(variableEnPassat)); // -e x,y t-1
+
+                    futureToPast.add(concPast);
+                    efstate.set(i, j, "X");
+                }
+            }
+        }
+        /*
         for (Position pos : impossiblesBoxes) {
             int variableEnFutur = coordToLineal(pos.x, pos.y, EnvelopeFutureOffset);
             int variableEnPassat = coordToLineal(pos.x, pos.y, EnvelopePastOffset);
 
-            VecInt variablePositive = new VecInt();
-            variablePositive.insertFirst(variableEnFutur);
+            VecInt variableNegative = new VecInt();
+            variableNegative.insertFirst(-variableEnFutur); // -e x,y t+1
 
-            if (!(solver.isSatisfiable(variablePositive))) {
+            if (!(solver.isSatisfiable(variableNegative))) {
                 // Add conclusion to list, but rewritten with respect to "past" variables
                 VecInt concPast = new VecInt();
-                concPast.insertFirst(-(variableEnPassat));
+                concPast.insertFirst(-(variableEnPassat)); // -e x,y t-1
 
                 futureToPast.add(concPast);
                 efstate.set(pos.x, pos.y, "X");
             }
         }
+        */
     }
 
     /**
@@ -462,7 +493,6 @@ public class EnvelopeFinder {
         //
         //  Insert the clause into the formula:
         //  solver.addClause(Clause);
-        //TODO: Afegir alguns sets de clausules, pero quins?
 
         return solver;
     }
