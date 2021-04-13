@@ -310,8 +310,7 @@ public class EnvelopeFinder {
         }
         // Possibles es totes les posicions on detecte el sensor
         for (int i = 0; i < detects.length(); i++) {
-            System.out.println(((int) detects.charAt(i)) == 1);
-            if ((int) detects.charAt(i) == 1) {
+            if (Character.getNumericValue(detects.charAt(i)) == 1) {
                 for (int j = 0; j < 3; j++) {
                     for (Position pos : impossiblesBoxes) {
                         if (pos.x == x + 1 && pos.y == y - 1 + j) {
@@ -320,7 +319,7 @@ public class EnvelopeFinder {
                         }
                     }
                 }
-            } else if (detects.charAt(i) == 2) {
+            } else if (Character.getNumericValue(detects.charAt(i)) == 2) {
                 for (int ii = 0; ii < 3; ii++) {
                     for (Position pos : impossiblesBoxes) {
                         if (pos.x == x - 1 + ii && pos.y == y + 1) {
@@ -329,7 +328,7 @@ public class EnvelopeFinder {
                         }
                     }
                 }
-            } else if (detects.charAt(i) == 3) {
+            } else if (Character.getNumericValue(detects.charAt(i)) == 3) {
                 for (int j = 0; j < 3; j++) {
                     for (Position pos : impossiblesBoxes) {
                         if (pos.x == x - 1 && pos.y == y - 1 + j) {
@@ -338,7 +337,7 @@ public class EnvelopeFinder {
                         }
                     }
                 }
-            } else if (detects.charAt(i) == 4) {
+            } else if (Character.getNumericValue(detects.charAt(i)) == 4) {
                 for (int ii = 0; ii < 3; ii++) {
                     for (Position pos : impossiblesBoxes) {
                         if (pos.x == x - 1 + ii && pos.y == y - 1) {
@@ -347,7 +346,7 @@ public class EnvelopeFinder {
                         }
                     }
                 }
-            } else if (detects.charAt(i) == 5) {
+            } else if (Character.getNumericValue(detects.charAt(i)) == 5) {
                 for (Position pos : impossiblesBoxes) {
                     if (pos.x == x && pos.y == y) {
                         impossiblesBoxes.remove(pos);
@@ -430,7 +429,7 @@ public class EnvelopeFinder {
                 int variableEnPassat = coordToLineal(i, j, EnvelopePastOffset);
 
                 VecInt variableNegative = new VecInt();
-                variableNegative.insertFirst(variableEnFutur); // -e x,y t+1
+                variableNegative.insertFirst(variableEnFutur); // e x,y t+1
 
                 if (!(solver.isSatisfiable(variableNegative))) {
                     // Add conclusion to list, but rewritten with respect to "past" variables
