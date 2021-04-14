@@ -1,10 +1,6 @@
 package apryraz.eworld;
 
-import java.io.IOException;
-
 import org.sat4j.specs.*;
-import org.sat4j.minisat.*;
-import org.sat4j.reader.*;
 
 /**
  * The class for the main program of the Barcenas World
@@ -23,7 +19,7 @@ public class EnvelopeWorld {
      **/
     public static void runStepsSequence(int wDim,
                                         int numSteps, String fileSteps, String fileEnvelopes) throws
-            IOException, ContradictionException, TimeoutException {
+            ContradictionException, TimeoutException {
         // Make instances of TreasureFinder agent and environment object classes
         EnvelopeFinder EAgent = new EnvelopeFinder(wDim);
         EnvelopeWorldEnv EnvAgent = new EnvelopeWorldEnv(wDim, fileEnvelopes);
@@ -48,8 +44,7 @@ public class EnvelopeWorld {
      * arg[4] = file name with sequence of steps to perform
      * arg[5] = file name with list of envelopes positions
      **/
-    public static void main(String[] args) throws ParseFormatException,
-            IOException, ContradictionException, TimeoutException {
+    public static void main(String[] args) throws ContradictionException, TimeoutException {
 
         // Here I run a concrete example, but you should read parameters from
         // the command line, as decribed above.

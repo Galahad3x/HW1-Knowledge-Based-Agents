@@ -1,19 +1,14 @@
 package apryraz.eworld;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
 import static java.lang.System.exit;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,7 +16,6 @@ import org.sat4j.core.VecInt;
 
 import org.sat4j.specs.*;
 import org.sat4j.minisat.*;
-import org.sat4j.reader.*;
 
 /**
  * This agent performs a sequence of movements, and after each
@@ -77,7 +71,6 @@ public class EnvelopeFinder {
      * ArrayList where we will save the detector answer
      */
     ArrayList<Position> impossiblesBoxes;
-    ArrayList<Position> possiblesBoxes;
 
 
     /**
@@ -87,7 +80,6 @@ public class EnvelopeFinder {
      **/
     int EnvelopePastOffset;
     int EnvelopeFutureOffset;
-    int DetectorOffset;
     int actualLiteral;
 
     /**
@@ -101,11 +93,7 @@ public class EnvelopeFinder {
         WorldDim = WDim;
         WorldLinealDim = WorldDim * WorldDim;
 
-        try {
-            solver = buildGamma();
-        } catch (IOException | ContradictionException ex) {
-            Logger.getLogger(EnvelopeFinder.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        solver = buildGamma();
         numMovements = 0;
         idNextStep = 0;
         System.out.println("STARTING Envelope FINDER AGENT...");
@@ -180,7 +168,7 @@ public class EnvelopeFinder {
      * result of the logical inferences performed by the agent with its formula.
      **/
     public void runNextStep() throws
-            IOException, ContradictionException, TimeoutException {
+            ContradictionException, TimeoutException {
         // Add the conclusions obtained in the previous step
         // but as clauses that use the "past" variables
         addLastFutureClausesToPastClauses();
@@ -282,8 +270,7 @@ public class EnvelopeFinder {
      *            DetectorValue must be a number that encodes all the valid readings
      *            of the sensor given the envelopes in the 3x3 square around (x,y)
      **/
-    public void processDetectorSensorAnswer(AMessage ans) throws
-            IOException, ContradictionException, TimeoutException {
+    public void processDetectorSensorAnswer(AMessage ans) throws ContradictionException {
 
         int x = Integer.parseInt(ans.getComp(1));
         int y = Integer.parseInt(ans.getComp(2));
@@ -299,16 +286,14 @@ public class EnvelopeFinder {
 
         // CALL your functions HERE
         impossiblesBoxes = new ArrayList<>();
-        possiblesBoxes = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 if (this.EnvAgent.withinLimits(x - 1 + i, y - 1 + j)) {
                     impossiblesBoxes.add(new Position(x - 1 + i, y - 1 + j));
-                    possiblesBoxes.add(new Position(x - 1 + i, y - 1 + j));
                 }
             }
         }
-        // Possibles es totes les posicions on detecte el sensor
+        // Possibles es totes les posicions on detecta el sensor
         for (int i = 0; i < detects.length(); i++) {
             if (Character.getNumericValue(detects.charAt(i)) == 1) {
                 for (int j = 0; j < 3; j++) {
@@ -354,9 +339,6 @@ public class EnvelopeFinder {
                     }
                 }
             }
-            for (Position pos : impossiblesBoxes) {
-                possiblesBoxes.remove(pos);
-            }
         }
         //Impossibles es les posicions on SEGUR que no hi ha sobre
         for (Position pos : impossiblesBoxes) {
@@ -373,8 +355,7 @@ public class EnvelopeFinder {
      * futureToPast to the formula stored in solver.
      * Use the function addClause( VecInt ) to add each clause to the solver
      **/
-    public void addLastFutureClausesToPastClauses() throws IOException,
-            ContradictionException, TimeoutException {
+    public void addLastFutureClausesToPastClauses() throws ContradictionException {
         for (VecInt vec : futureToPast) {
             solver.addClause(vec);
         }
@@ -393,8 +374,7 @@ public class EnvelopeFinder {
      * conclusions that were already added in previous steps, although this will not produce
      * any bad functioning in the reasoning process with the formula.
      **/
-    public void performInferenceQuestions() throws IOException,
-            ContradictionException, TimeoutException {
+    public void performInferenceQuestions() throws TimeoutException {
 
         /*
         // EXAMPLE code to check this for position (2,3):
@@ -417,12 +397,6 @@ public class EnvelopeFinder {
             efstate.set(2, 3, "X");
         }
         */
-
-        //TODO
-        // Mira si les posicions del futur son possibles, si no ho son, insereix aquestes posicions
-        // a la futureToPast list fent servir les variables del passat de la mateixa posició.
-        // Per a fer-ho més eficient hem de comprovar si aquesta posició p que volem afegir, ja esta afegida. Si es així
-        // no cal afegir-la.
         for (int i = 1; i < EnvAgent.WorldDim + 1; i++) {
             for (int j = 1; j < EnvAgent.WorldDim + 1; j++) {
                 int variableEnFutur = coordToLineal(i, j, EnvelopeFutureOffset);
@@ -467,8 +441,7 @@ public class EnvelopeFinder {
      *
      * @return returns the solver object where the formula has been stored
      **/
-    public ISolver buildGamma() throws UnsupportedEncodingException,
-            FileNotFoundException, IOException, ContradictionException {
+    public ISolver buildGamma() {
         //Number of positions in the map, that can have envelopes or not
         int totalNumVariables = this.WorldLinealDim;
 
