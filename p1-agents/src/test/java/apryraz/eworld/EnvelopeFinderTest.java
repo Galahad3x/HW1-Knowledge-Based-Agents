@@ -42,7 +42,7 @@ public class EnvelopeFinderTest {
             IOException, ContradictionException, TimeoutException {
         // Check (assert) whether the resulting state is equal to
         //  the targetState after performing action runNextStep with bAgent
-
+        // TODO
     }
 
 
@@ -85,7 +85,6 @@ public class EnvelopeFinderTest {
         try {
             BufferedReader br = new BufferedReader(new FileReader(statesFile));
             String row;
-
             // steps = br.readLine();
             for (int s = 0; s < numStates; s++) {
                 listOfStates.add(readTargetStateFromFile(br, wDim));
@@ -100,7 +99,6 @@ public class EnvelopeFinderTest {
             Logger.getLogger(EnvelopeFinderTest.class.getName()).log(Level.SEVERE, null, ex);
             exit(2);
         }
-
         return listOfStates;
     }
 
@@ -120,7 +118,7 @@ public class EnvelopeFinderTest {
                                    int numSteps, String fileSteps, String fileStates,
                                    String fileEnvelopes)
             throws IOException, ContradictionException, TimeoutException {
-        // You should make TreasureFinder and TreasureWorldEnv objects to  test.
+        // You should make TreasureFinder and TreasureWorldEnv objects to test.
         // Then load sequence of target states, load sequence of steps into the eAgent
         // and then test the sequence calling testMakeSimpleStep once for each step.
         EnvelopeFinder eAgent = null;
@@ -136,6 +134,7 @@ public class EnvelopeFinderTest {
 
         // Test here the sequence of steps and check the resulting states with the
         // ones in seqOfStates
+        // TODO
     }
 
     /**
@@ -148,5 +147,4 @@ public class EnvelopeFinderTest {
         // Example test for 4x4 world , Treasure at 3,3 and 5 steps
         testMakeSeqOfSteps(4, 5, "tests/steps1.txt", "tests/states1.txt", "tests/envelopes1.txt");
     }
-
 }
