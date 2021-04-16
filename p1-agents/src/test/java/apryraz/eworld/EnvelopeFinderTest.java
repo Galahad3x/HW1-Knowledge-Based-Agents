@@ -43,7 +43,7 @@ public class EnvelopeFinderTest {
         target.initializeState();
         target.set(1, 1, "X");
     }
-    
+
     /**
      * This function should execute the next step of the agent, and the assert
      * whether the resulting state is equal to the targetState
