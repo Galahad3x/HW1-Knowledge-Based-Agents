@@ -393,28 +393,6 @@ public class EnvelopeFinder {
      * any bad functioning in the reasoning process with the formula.
      **/
     public void performInferenceQuestions() throws TimeoutException {
-
-        /*
-        // EXAMPLE code to check this for position (2,3):
-        // Get variable number for position 2,3 in past variables
-        int linealIndex = coordToLineal(2, 3, EnvelopeFutureOffset);
-        // Get the same variable, but in the past subset
-        int linealIndexPast = coordToLineal(2, 3, EnvelopePastOffset);
-
-        VecInt variablePositive = new VecInt();
-        variablePositive.insertFirst(linealIndex);
-
-        // Check if Gamma + variablePositive is unsatisfiable:
-        // This is only AN EXAMPLE for a specific position: (2,3)
-        if (!(solver.isSatisfiable(variablePositive))) {
-            // Add conclusion to list, but rewritten with respect to "past" variables
-            VecInt concPast = new VecInt();
-            concPast.insertFirst(-(linealIndexPast));
-
-            futureToPast.add(concPast);
-            efstate.set(2, 3, "X");
-        }
-        */
         for (int i = 1; i < EnvAgent.WorldDim + 1; i++) {
             for (int j = 1; j < EnvAgent.WorldDim + 1; j++) {
                 int variableEnFutur = coordToLineal(i, j, EnvelopeFutureOffset);
@@ -433,24 +411,6 @@ public class EnvelopeFinder {
                 }
             }
         }
-        /*
-        for (Position pos : impossiblesBoxes) {
-            int variableEnFutur = coordToLineal(pos.x, pos.y, EnvelopeFutureOffset);
-            int variableEnPassat = coordToLineal(pos.x, pos.y, EnvelopePastOffset);
-
-            VecInt variableNegative = new VecInt();
-            variableNegative.insertFirst(-variableEnFutur); // -e x,y t+1
-
-            if (!(solver.isSatisfiable(variableNegative))) {
-                // Add conclusion to list, but rewritten with respect to "past" variables
-                VecInt concPast = new VecInt();
-                concPast.insertFirst(-(variableEnPassat)); // -e x,y t-1
-
-                futureToPast.add(concPast);
-                efstate.set(pos.x, pos.y, "X");
-            }
-        }
-        */
     }
 
     /**
@@ -472,17 +432,6 @@ public class EnvelopeFinder {
         // This variable is used to generate, in a particular sequential order,
         // the variable indentifiers of all the variables
         actualLiteral = 1;
-
-        // call here functions to add the different sets of clauses
-        // of Gamma to the solver object
-        //
-        // EXEMPLE of building a clause:
-        // VecInt Clause = new VecInt();
-        //  insert a literal into the clause:
-        //    Clause.insertFirst(actualLiteral);
-        //
-        //  Insert the clause into the formula:
-        //  solver.addClause(Clause);
 
         return solver;
     }

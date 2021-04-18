@@ -12,7 +12,7 @@ import static java.lang.System.exit;
 
 public class EnvelopeWorldEnv {
     /**
-     * world dimension
+     * World dimension
      **/
     int WorldDim;
 
@@ -33,7 +33,7 @@ public class EnvelopeWorldEnv {
     }
 
     /**
-     * Load the list of pirates locations
+     * Load the list of envelopes locations
      *
      * @param envelopeFile: name of the file that should contain a
      *                      set of envelope locations in a single line.
@@ -108,6 +108,13 @@ public class EnvelopeWorldEnv {
         return ans;
     }
 
+    /**
+     * Check if there is an envelope in a certain location
+     *
+     * @param x x coordinate to check
+     * @param y y coordinate to check
+     * @return true or false depending on if there is an envelope or not
+     */
     private boolean hasEnvelopeAt(int x, int y) {
         for (Position pos : this.envelopePositions) {
             if (pos.x == x && pos.y == y) {
