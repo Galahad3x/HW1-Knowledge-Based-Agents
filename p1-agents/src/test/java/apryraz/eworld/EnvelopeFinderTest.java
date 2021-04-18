@@ -1,27 +1,19 @@
 package apryraz.eworld;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.junit.Test;
+import org.sat4j.specs.ContradictionException;
+import org.sat4j.specs.TimeoutException;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static java.lang.System.exit;
-
-import org.sat4j.specs.*;
-import org.sat4j.minisat.*;
-import org.sat4j.reader.*;
-
-
-import apryraz.eworld.*;
-
 import static org.junit.Assert.assertEquals;
-
-import org.junit.*;
 
 /**
  * Class for testing the TreasureFinder agent
@@ -30,18 +22,14 @@ public class EnvelopeFinderTest {
 
     EnvelopeFinder eAgent;
     EnvelopeWorldEnv env;
-    EFState target;
+    ArrayList<EFState> states;
 
-    @Before
-    public void setUp() throws Exception {
-        eAgent = new EnvelopeFinder(5);
-        env = new EnvelopeWorldEnv(5, "tests/envelopes1.txt");
+    public void setUp(String envelopesFile, String stepsFile, String statesFile, int wDim, int numStates) {
+        eAgent = new EnvelopeFinder(wDim);
+        env = new EnvelopeWorldEnv(wDim, envelopesFile);
         eAgent.setEnvironment(env);
-        eAgent.loadListOfSteps(5, "tests/steps1.txt");
-
-        target = new EFState(5);
-        target.initializeState();
-        target.set(1, 1, "X");
+        eAgent.loadListOfSteps(numStates, stepsFile);
+        states = loadListOfTargetStates(wDim, numStates, statesFile);
     }
 
     /**
@@ -54,7 +42,7 @@ public class EnvelopeFinderTest {
      **/
     public void testMakeSimpleStep(EnvelopeFinder eAgent,
                                    EFState targetState) throws
-            IOException, ContradictionException, TimeoutException {
+            ContradictionException, TimeoutException {
         // Check (assert) whether the resulting state is equal to
         //  the targetState after performing action runNextStep with bAgent
         eAgent.runNextStep();
@@ -96,16 +84,15 @@ public class EnvelopeFinderTest {
      **/
     ArrayList<EFState> loadListOfTargetStates(int wDim, int numStates, String statesFile) {
 
-        ArrayList<EFState> listOfStates = new ArrayList<EFState>(numStates);
+        ArrayList<EFState> listOfStates = new ArrayList<>(numStates);
 
         try {
             BufferedReader br = new BufferedReader(new FileReader(statesFile));
-            String row;
             // steps = br.readLine();
             for (int s = 0; s < numStates; s++) {
                 listOfStates.add(readTargetStateFromFile(br, wDim));
                 // Read a blank line between states
-                row = br.readLine();
+                br.readLine();
             }
             br.close();
         } catch (FileNotFoundException ex) {
@@ -122,16 +109,9 @@ public class EnvelopeFinderTest {
     /**
      * This function should run the sequence of steps stored in the file fileSteps,
      * but only up to numSteps steps.
-     *
-     * @param wDim          the dimension of world
-     * @param numSteps      num of steps to perform
-     * @param fileSteps     file name with sequence of steps to perform
-     * @param fileStates    file name with sequence of target states, that should
-     *                      be the resulting states after each movement in fileSteps
-     * @param fileEnvelopes the file with the envelopes
      **/
     public void testMakeSeqOfSteps()
-            throws IOException, ContradictionException, TimeoutException {
+            throws ContradictionException, TimeoutException {
         // You should make TreasureFinder and TreasureWorldEnv objects to test.
         // Then load sequence of target states, load sequence of steps into the eAgent
         // and then test the sequence calling testMakeSimpleStep once for each step.
@@ -148,7 +128,6 @@ public class EnvelopeFinderTest {
 
         // Test here the sequence of steps and check the resulting states with the
         // ones in seqOfStates
-        ArrayList<EFState> states = loadListOfTargetStates(5, 5, "tests/states1.txt");
         for (EFState state : states) {
             eAgent.runNextStep();
             assertEquals(state, eAgent.getState());
@@ -160,15 +139,54 @@ public class EnvelopeFinderTest {
      * test sequence, or use some kind of parametric tests with junit
      **/
     @Test
-    public void TWorldTest1() throws
-            IOException, ContradictionException, TimeoutException {
-        // Example test for 4x4 world , Treasure at 3,3 and 5 steps
-        testMakeSeqOfSteps();
+    public void SeqOfStepsTests() throws
+            Exception {
+        for (int i = 1; i < 5; i++){
+            String statesFile = "tests/states" + i + ".txt";
+            String envsFile = "tests/envelopes" + i + ".txt";
+            String stepsFile = "tests/steps" + i + ".txt";
+            int wDim, numStates;
+            if (i < 3){
+                wDim = 5;
+                numStates = 5;
+                if(i == 2){
+                    numStates = 7;
+                }
+            }else{
+                wDim = 7;
+                if(i == 3){
+                    numStates = 6;
+                }else{
+                    numStates = 12;
+                }
+            }
+            setUp(envsFile, stepsFile, statesFile, wDim, numStates);
+            testMakeSeqOfSteps();
+            System.out.println("TEST " + i + " DONE");
+        }
     }
     @Test
-    public void TWorldTest2() throws
-            IOException, ContradictionException, TimeoutException {
-        // Example test for 4x4 world , Treasure at 3,3 and 5 steps
-        testMakeSimpleStep(eAgent, target);
+    public void SimpleStepTests() throws
+            Exception {
+        for (int i = 1; i < 5; i++){
+            String statesFile = "tests/states" + i + ".txt";
+            String envsFile = "tests/envelopes" + i + ".txt";
+            String stepsFile = "tests/steps" + i + ".txt";
+            int wDim, numStates;
+            if (i < 3){
+                wDim = 5;
+                numStates = 5;
+            }else{
+                wDim = 7;
+                if(i == 3){
+                    numStates = 6;
+                }else{
+                    numStates = 12;
+                }
+            }
+            setUp(envsFile, stepsFile, statesFile, wDim, numStates);
+            testMakeSimpleStep(eAgent, states.get(0));
+            System.out.println("TEST " + i + " DONE");
+        }
     }
 }

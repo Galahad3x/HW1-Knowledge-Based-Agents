@@ -29,6 +29,9 @@ public class EFState {
     }
 
     public boolean equals(Object obj) {
+        if(!(obj instanceof EFState)){
+            return false;
+        }
         EFState efstate2 = (EFState) obj;
         boolean status = true;
 

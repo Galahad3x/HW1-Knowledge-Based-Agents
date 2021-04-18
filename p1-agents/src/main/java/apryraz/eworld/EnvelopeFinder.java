@@ -1,21 +1,20 @@
 package apryraz.eworld;
 
-import java.util.ArrayList;
+import org.sat4j.core.VecInt;
+import org.sat4j.minisat.SolverFactory;
+import org.sat4j.specs.ContradictionException;
+import org.sat4j.specs.ISolver;
+import org.sat4j.specs.TimeoutException;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-
-import static java.lang.System.exit;
-
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.sat4j.core.VecInt;
-
-import org.sat4j.specs.*;
-import org.sat4j.minisat.*;
+import static java.lang.System.exit;
 
 /**
  * This agent performs a sequence of movements, and after each
@@ -340,13 +339,32 @@ public class EnvelopeFinder {
                 }
             }
         }
+        if (!detects.contains("1") || !detects.contains("2")) {
+            if (EnvAgent.withinLimits(x + 1, y + 1)) {
+                impossiblesBoxes.add(new Position(x + 1, y + 1));
+            }
+        }
+        if (!detects.contains("1") || !detects.contains("4")) {
+            if (EnvAgent.withinLimits(x + 1, y - 1)) {
+                impossiblesBoxes.add(new Position(x + 1, y - 1));
+            }
+        }
+        if (!detects.contains("3") || !detects.contains("2")) {
+            if (EnvAgent.withinLimits(x - 1, y + 1)) {
+                impossiblesBoxes.add(new Position(x - 1, y + 1));
+            }
+        }
+        if (!detects.contains("3") || !detects.contains("4")) {
+            if (EnvAgent.withinLimits(x - 1, y - 1)) {
+                impossiblesBoxes.add(new Position(x - 1, y - 1));
+            }
+        }
         //Impossibles es les posicions on SEGUR que no hi ha sobre
         for (Position pos : impossiblesBoxes) {
             int variableEnFutur = coordToLineal(pos.x, pos.y, EnvelopeFutureOffset);
             VecInt clausula = new VecInt();
             clausula.insertFirst(-variableEnFutur); // -e x,y t+1
             solver.addClause(clausula);
-            System.out.println("ADDED TO FORMULA: -e " + pos.x + " " + pos.y);
         }
     }
 
@@ -486,21 +504,4 @@ public class EnvelopeFinder {
         return ((x - 1) * WorldDim) + (y - 1) + offset;
     }
 
-    /**
-     * Perform the inverse computation to the previous function.
-     * That is, from the identifier t_[x,y] to the coordinates  (x,y)
-     * that it represents
-     *
-     * @param lineal identifier of the variable
-     * @param offset offset associated with the subset of variables that
-     *               lineal belongs to
-     * @return array with x and y coordinates
-     **/
-    public int[] linealToCoord(int lineal, int offset) {
-        lineal = lineal - offset + 1;
-        int[] coords = new int[2];
-        coords[1] = ((lineal - 1) % WorldDim) + 1;
-        coords[0] = (lineal - 1) / WorldDim + 1;
-        return coords;
-    }
 }
