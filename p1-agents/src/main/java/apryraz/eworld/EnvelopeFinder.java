@@ -1,3 +1,8 @@
+/**
+ * @author Joel Aumedes Serrano (48051307Y)
+ * @author Joel Farré Cortés (78103400T)
+ **/
+
 package apryraz.eworld;
 
 import org.sat4j.core.VecInt;
@@ -70,7 +75,6 @@ public class EnvelopeFinder {
      * ArrayList where we will save the detector answer
      */
     ArrayList<Position> impossiblesBoxes;
-
 
     /**
      * This set of variables CAN be use to mark the beginning of different sets
@@ -283,7 +287,9 @@ public class EnvelopeFinder {
         // of the agent) and the past is consistent with the future in your Gamma
         // formula
 
-        // CALL your functions HERE
+        /**
+         * Initializes all the possible states
+         **/
         impossiblesBoxes = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
@@ -292,7 +298,14 @@ public class EnvelopeFinder {
                 }
             }
         }
-        // Possibles es totes les posicions on detecta el sensor
+        /**
+         * Creates the sensor of the agent.
+         * Sensor value:
+         * 1 -> Positions: {(x+1, y-1), (x+1, y), (x+1, y)}
+         * 2 -> Positions: {(x-1, y+1), (x, y+1), (x+1, y+1)}
+         * 3 -> Positions: {(x-1, y-1), (x-1, y), (x-1, y)}
+         * 4 -> Positions: {(x-1, y-1), (x, y-1), (x+1, y-1)}
+         **/
         for (int i = 0; i < detects.length(); i++) {
             if (Character.getNumericValue(detects.charAt(i)) == 1) {
                 for (int j = 0; j < 3; j++) {
@@ -452,5 +465,4 @@ public class EnvelopeFinder {
     public int coordToLineal(int x, int y, int offset) {
         return ((x - 1) * WorldDim) + (y - 1) + offset;
     }
-
 }

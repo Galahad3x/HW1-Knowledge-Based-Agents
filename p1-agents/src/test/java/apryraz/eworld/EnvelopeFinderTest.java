@@ -1,3 +1,8 @@
+/**
+ * @author Joel Aumedes Serrano (48051307Y)
+ * @author Joel Farré Cortés (78103400T)
+ **/
+
 package apryraz.eworld;
 
 import org.junit.Test;
@@ -20,8 +25,19 @@ import static org.junit.Assert.assertEquals;
  **/
 public class EnvelopeFinderTest {
 
+    /**
+     * eAgent   Search agent
+     **/
     EnvelopeFinder eAgent;
+
+    /**
+     * env  Envelope world that simulates the positions of the envelopes
+     **/
     EnvelopeWorldEnv env;
+
+    /**
+     * states   List of the results that the agent sould return to check it correctly
+     **/
     ArrayList<EFState> states;
 
     public void setUp(String envelopesFile, String stepsFile, String statesFile, int wDim, int numStates) {
@@ -48,7 +64,6 @@ public class EnvelopeFinderTest {
         eAgent.runNextStep();
         assertEquals(targetState, eAgent.getState());
     }
-
 
     /**
      * Read an state from the current position of the file trough the
@@ -105,7 +120,6 @@ public class EnvelopeFinderTest {
         return listOfStates;
     }
 
-
     /**
      * This function should run the sequence of steps stored in the file fileSteps,
      * but only up to numSteps steps.
@@ -135,8 +149,7 @@ public class EnvelopeFinderTest {
     }
 
     /**
-     * This is an example test. You must replicate this method for each different
-     * test sequence, or use some kind of parametric tests with junit
+     * Test for every file set of all the steps
      **/
     @Test
     public void SeqOfStepsTests() throws
@@ -165,6 +178,10 @@ public class EnvelopeFinderTest {
             System.out.println("TEST " + i + " DONE");
         }
     }
+
+    /**
+     * Test for every file set of a single step
+     **/
     @Test
     public void SimpleStepTests() throws
             Exception {

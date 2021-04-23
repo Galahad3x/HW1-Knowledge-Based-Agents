@@ -1,3 +1,8 @@
+/**
+ * @author Joel Aumedes Serrano (48051307Y)
+ * @author Joel Farré Cortés (78103400T)
+ **/
+
 package apryraz.eworld;
 
 import org.sat4j.specs.*;
@@ -24,7 +29,6 @@ public class EnvelopeWorld {
         EnvelopeFinder EAgent = new EnvelopeFinder(wDim);
         EnvelopeWorldEnv EnvAgent = new EnvelopeWorldEnv(wDim, fileEnvelopes);
 
-
         // save environment object into EAgent
         EAgent.setEnvironment(EnvAgent);
 
@@ -45,9 +49,6 @@ public class EnvelopeWorld {
      * arg[5] = file name with list of envelopes positions
      **/
     public static void main(String[] args) throws ContradictionException, TimeoutException {
-
-        // Here I run a concrete example, but you should read parameters from
-        // the command line, as decribed above.
 
         int wDim = Integer.parseInt(args[0]);
         int numSteps = Integer.parseInt(args[1]);

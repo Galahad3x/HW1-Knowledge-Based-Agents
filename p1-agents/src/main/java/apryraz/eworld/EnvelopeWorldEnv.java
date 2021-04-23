@@ -1,3 +1,8 @@
+/**
+ * @author Joel Aumedes Serrano (48051307Y)
+ * @author Joel Farré Cortés (78103400T)
+ **/
+
 package apryraz.eworld;
 
 import java.io.BufferedReader;
@@ -66,9 +71,14 @@ public class EnvelopeWorldEnv {
      * by returning an appropriate answer
      * It should answer to moveto and detectsat messages
      *
+     *
+     * "detectsat": Calculate and return the sensor answer for a specific position.
+     *
      * @param msg message sent by the Agent
      * @return a msg with the answer to return to the agent
+     *
      **/
+
     public AMessage acceptMessage(AMessage msg) {
         AMessage ans = new AMessage("voidmsg", "", "", "");
 
