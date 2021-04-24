@@ -5,6 +5,7 @@
 
 package apryraz.eworld;
 
+import org.sat4j.core.Vec;
 import org.sat4j.core.VecInt;
 import org.sat4j.minisat.SolverFactory;
 import org.sat4j.specs.ContradictionException;
@@ -74,7 +75,9 @@ public class EnvelopeFinder {
     /**
      * ArrayList where we will save the detector answer
      */
-    ArrayList<Position> impossiblesBoxes;
+    ArrayList<Position> allStates;
+    ArrayList<Position> futureKnowledge;
+    ArrayList<Position> pastKnowlegde;
 
     /**
      * This set of variables CAN be use to mark the beginning of different sets
@@ -290,11 +293,11 @@ public class EnvelopeFinder {
         /**
          * Initializes all the possible states
          **/
-        impossiblesBoxes = new ArrayList<>();
+        allStates = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 if (this.EnvAgent.withinLimits(x - 1 + i, y - 1 + j)) {
-                    impossiblesBoxes.add(new Position(x - 1 + i, y - 1 + j));
+                    allStates.add(new Position(x - 1 + i, y - 1 + j));
                 }
             }
         }
@@ -309,44 +312,44 @@ public class EnvelopeFinder {
         for (int i = 0; i < detects.length(); i++) {
             if (Character.getNumericValue(detects.charAt(i)) == 1) {
                 for (int j = 0; j < 3; j++) {
-                    for (Position pos : impossiblesBoxes) {
+                    for (Position pos : allStates) {
                         if (pos.x == x + 1 && pos.y == y - 1 + j) {
-                            impossiblesBoxes.remove(pos);
+                            futureKnowledge.add(pos);
                             break;
                         }
                     }
                 }
             } else if (Character.getNumericValue(detects.charAt(i)) == 2) {
                 for (int ii = 0; ii < 3; ii++) {
-                    for (Position pos : impossiblesBoxes) {
+                    for (Position pos : allStates) {
                         if (pos.x == x - 1 + ii && pos.y == y + 1) {
-                            impossiblesBoxes.remove(pos);
+                            futureKnowledge.add(pos);
                             break;
                         }
                     }
                 }
             } else if (Character.getNumericValue(detects.charAt(i)) == 3) {
                 for (int j = 0; j < 3; j++) {
-                    for (Position pos : impossiblesBoxes) {
+                    for (Position pos : allStates) {
                         if (pos.x == x - 1 && pos.y == y - 1 + j) {
-                            impossiblesBoxes.remove(pos);
+                            futureKnowledge.add(pos);
                             break;
                         }
                     }
                 }
             } else if (Character.getNumericValue(detects.charAt(i)) == 4) {
                 for (int ii = 0; ii < 3; ii++) {
-                    for (Position pos : impossiblesBoxes) {
+                    for (Position pos : allStates) {
                         if (pos.x == x - 1 + ii && pos.y == y - 1) {
-                            impossiblesBoxes.remove(pos);
+                            futureKnowledge.add(pos);
                             break;
                         }
                     }
                 }
             } else if (Character.getNumericValue(detects.charAt(i)) == 5) {
-                for (Position pos : impossiblesBoxes) {
+                for (Position pos : allStates) {
                     if (pos.x == x && pos.y == y) {
-                        impossiblesBoxes.remove(pos);
+                        futureKnowledge.add(pos);
                         break;
                     }
                 }
@@ -354,26 +357,26 @@ public class EnvelopeFinder {
         }
         if (!detects.contains("1") || !detects.contains("2")) {
             if (EnvAgent.withinLimits(x + 1, y + 1)) {
-                impossiblesBoxes.add(new Position(x + 1, y + 1));
+                futureKnowledge.add(new Position(x + 1, y + 1));
             }
         }
         if (!detects.contains("1") || !detects.contains("4")) {
             if (EnvAgent.withinLimits(x + 1, y - 1)) {
-                impossiblesBoxes.add(new Position(x + 1, y - 1));
+                futureKnowledge.add(new Position(x + 1, y - 1));
             }
         }
         if (!detects.contains("3") || !detects.contains("2")) {
             if (EnvAgent.withinLimits(x - 1, y + 1)) {
-                impossiblesBoxes.add(new Position(x - 1, y + 1));
+                futureKnowledge.add(new Position(x - 1, y + 1));
             }
         }
         if (!detects.contains("3") || !detects.contains("4")) {
             if (EnvAgent.withinLimits(x - 1, y - 1)) {
-                impossiblesBoxes.add(new Position(x - 1, y - 1));
+                futureKnowledge.add(new Position(x - 1, y - 1));
             }
         }
         //Impossibles es les posicions on SEGUR que no hi ha sobre
-        for (Position pos : impossiblesBoxes) {
+        for (Position pos : futureKnowledge) {
             int variableEnFutur = coordToLineal(pos.x, pos.y, EnvelopeFutureOffset);
             VecInt clausula = new VecInt();
             clausula.insertFirst(-variableEnFutur); // -e x,y t+1
