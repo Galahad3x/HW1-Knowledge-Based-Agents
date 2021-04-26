@@ -438,8 +438,7 @@ public class EnvelopeFinder {
                     solver.addClause(clauseS1);
                     solver.addClause(clauseS2);
                     solver.addClause(clause);
-                }
-                if (EnvAgent.withinLimits(x - 1, y + 1)) {
+                } else if (EnvAgent.withinLimits(x - 1, y + 1)) {
                     VecInt clauseS2 = new VecInt();
                     clauseS2.insertFirst(sensor2);
                     clauseS2.insertFirst(-coordToLineal(x - 1, y + 1, EnvelopeFutureOffset));
@@ -455,8 +454,7 @@ public class EnvelopeFinder {
                     solver.addClause(clauseS3);
                     solver.addClause(clauseS2);
                     solver.addClause(clause);
-                }
-                if (EnvAgent.withinLimits(x - 1, y - 1)) {
+                } else if (EnvAgent.withinLimits(x - 1, y - 1)) {
                     VecInt clauseS3 = new VecInt();
                     clauseS3.insertFirst(sensor3);
                     clauseS3.insertFirst(-coordToLineal(x - 1, y - 1, EnvelopeFutureOffset));
@@ -472,8 +470,7 @@ public class EnvelopeFinder {
                     solver.addClause(clauseS3);
                     solver.addClause(clauseS4);
                     solver.addClause(clause);
-                }
-                if (EnvAgent.withinLimits(x + 1, y - 1)) {
+                } else if (EnvAgent.withinLimits(x + 1, y - 1)) {
                     VecInt clauseS4 = new VecInt();
                     clauseS4.insertFirst(sensor4);
                     clauseS4.insertFirst(-coordToLineal(x + 1, y - 1, EnvelopeFutureOffset));
