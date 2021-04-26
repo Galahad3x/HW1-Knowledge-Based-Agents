@@ -101,7 +101,7 @@ public class EnvelopeFinder {
 
         EnvelopePastOffset = 1;
         EnvelopeFutureOffset = WorldLinealDim + 2;
-        DetectorOffset = EnvelopeFutureOffset + WorldLinealDim + 1;
+        DetectorOffset = EnvelopeFutureOffset + 2 + WorldLinealDim + 1;
 
         numMovements = 0;
         idNextStep = 0;
@@ -391,17 +391,17 @@ public class EnvelopeFinder {
         VecInt futureAllPossibleEnvelopes = new VecInt();
         VecInt pastAllPossibleEnvelopes = new VecInt();
 
-        /**
-         for (int x = 1; x < WorldDim + 1; x++) {
-         for (int y = 1; y < WorldDim + 1; y++) {
-         futureAllPossibleEnvelopes.insertFirst(coordToLineal(x, y, EnvelopeFutureOffset));
-         pastAllPossibleEnvelopes.insertFirst(coordToLineal(x, y, EnvelopePastOffset));
-         }
-         }
 
-         solver.addClause(futureAllPossibleEnvelopes);
-         solver.addClause(pastAllPossibleEnvelopes);
-         **/
+        for (int x = 1; x < WorldDim + 1; x++) {
+            for (int y = 1; y < WorldDim + 1; y++) {
+                futureAllPossibleEnvelopes.insertFirst(coordToLineal(x, y, EnvelopeFutureOffset));
+                pastAllPossibleEnvelopes.insertFirst(coordToLineal(x, y, EnvelopePastOffset));
+            }
+        }
+
+        solver.addClause(futureAllPossibleEnvelopes);
+        solver.addClause(pastAllPossibleEnvelopes);
+
 
         for (int x = 1; x < WorldDim + 1; x++) {
             for (int y = 1; y < WorldDim + 1; y++) {
