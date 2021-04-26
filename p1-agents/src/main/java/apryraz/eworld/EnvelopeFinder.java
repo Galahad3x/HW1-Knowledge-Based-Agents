@@ -9,7 +9,6 @@ import org.sat4j.core.VecInt;
 import org.sat4j.minisat.SolverFactory;
 import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.ISolver;
-import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.TimeoutException;
 
 import java.io.BufferedReader;
@@ -17,7 +16,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -84,18 +82,13 @@ public class EnvelopeFinder {
     int actualLiteral;
 
     /**
-     * List of evidences that we obtain from the sensor
-     */
-    VecInt Evidences = new VecInt();
-
-    /**
      * The class constructor must create the initial Boolean formula with the
      * rules of the Envelope World, initialize the variables for indicating
      * that we do not have yet any movements to perform, make the initial state.
      *
      * @param WDim the dimension of the Envelope World
      **/
-    public EnvelopeFinder(int WDim) throws ContradictionException {
+    public EnvelopeFinder(int WDim) {
         WorldDim = WDim;
         WorldLinealDim = WorldDim * WorldDim;
 
@@ -277,7 +270,7 @@ public class EnvelopeFinder {
      *            DetectorValue must be a number that encodes all the valid readings
      *            of the sensor given the envelopes in the 3x3 square around (x,y)
      **/
-    public void processDetectorSensorAnswer(AMessage ans) throws TimeoutException, ContradictionException {
+    public void processDetectorSensorAnswer(AMessage ans) throws ContradictionException {
 
         int x = Integer.parseInt(ans.getComp(1));
         int y = Integer.parseInt(ans.getComp(2));
@@ -388,6 +381,7 @@ public class EnvelopeFinder {
         //  Insert the clause into the formula:
         //  solver.addClause(Clause);
 
+<<<<<<< Updated upstream
         VecInt futureAllPossibleEnvelopes = new VecInt();
         VecInt pastAllPossibleEnvelopes = new VecInt();
 
@@ -403,6 +397,8 @@ public class EnvelopeFinder {
         solver.addClause(pastAllPossibleEnvelopes);
 
 
+=======
+>>>>>>> Stashed changes
         for (int x = 1; x < WorldDim + 1; x++) {
             for (int y = 1; y < WorldDim + 1; y++) {
 
