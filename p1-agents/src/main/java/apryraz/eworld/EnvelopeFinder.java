@@ -5,7 +5,6 @@
 
 package apryraz.eworld;
 
-import org.sat4j.core.Vec;
 import org.sat4j.core.VecInt;
 import org.sat4j.minisat.SolverFactory;
 import org.sat4j.specs.ContradictionException;
@@ -40,7 +39,7 @@ public class EnvelopeFinder {
     int idNextStep, numMovements;
 
     /**
-     * Array of clauses that represent conclusiones obtained in the last
+     * Array of clauses that represent conclusions obtained in the last
      * call to the inference function, but rewritten using the "past" variables
      **/
     ArrayList<VecInt> futureToPast = new ArrayList<>();
@@ -73,20 +72,19 @@ public class EnvelopeFinder {
     int WorldDim, WorldLinealDim;
 
     /**
-     * ArrayList where we will save the detector answer
-     */
-    ArrayList<Position> allStates;
-    ArrayList<Position> futureKnowledge;
-    ArrayList<Position> pastKnowlegde;
-
-    /**
      * This set of variables CAN be use to mark the beginning of different sets
      * of variables in your propositional formula (but you may have more sets of
      * variables in your solution).
      **/
     int EnvelopePastOffset;
     int EnvelopeFutureOffset;
+    int DetectorOffset;
     int actualLiteral;
+
+    /**
+     * List of evidences that we obtain from the sensor
+     */
+    ArrayList<Integer> Evidences = new ArrayList<>();
 
     /**
      * The class constructor must create the initial Boolean formula with the
@@ -95,17 +93,19 @@ public class EnvelopeFinder {
      *
      * @param WDim the dimension of the Envelope World
      **/
-    public EnvelopeFinder(int WDim) {
+    public EnvelopeFinder(int WDim) throws ContradictionException {
         WorldDim = WDim;
         WorldLinealDim = WorldDim * WorldDim;
 
         solver = buildGamma();
+
         numMovements = 0;
         idNextStep = 0;
         System.out.println("STARTING Envelope FINDER AGENT...");
 
         EnvelopePastOffset = 1;
         EnvelopeFutureOffset = WorldLinealDim + 2;
+        DetectorOffset = EnvelopeFutureOffset + WorldLinealDim + 1;
 
         efstate = new EFState(WorldDim);  // Initialize state (matrix) of knowledge with '?'
         efstate.printState();
@@ -276,7 +276,7 @@ public class EnvelopeFinder {
      *            DetectorValue must be a number that encodes all the valid readings
      *            of the sensor given the envelopes in the 3x3 square around (x,y)
      **/
-    public void processDetectorSensorAnswer(AMessage ans) throws ContradictionException {
+    public void processDetectorSensorAnswer(AMessage ans) {
 
         int x = Integer.parseInt(ans.getComp(1));
         int y = Integer.parseInt(ans.getComp(2));
@@ -290,98 +290,20 @@ public class EnvelopeFinder {
         // of the agent) and the past is consistent with the future in your Gamma
         // formula
 
-        /**
-         * Initializes all the possible states
-         **/
-        allStates = new ArrayList<>();
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                if (this.EnvAgent.withinLimits(x - 1 + i, y - 1 + j)) {
-                    allStates.add(new Position(x - 1 + i, y - 1 + j));
-                }
-            }
-        }
-        /**
-         * Creates the sensor of the agent.
-         * Sensor value:
-         * 1 -> Positions: {(x+1, y-1), (x+1, y), (x+1, y)}
-         * 2 -> Positions: {(x-1, y+1), (x, y+1), (x+1, y+1)}
-         * 3 -> Positions: {(x-1, y-1), (x-1, y), (x-1, y)}
-         * 4 -> Positions: {(x-1, y-1), (x, y-1), (x+1, y-1)}
-         **/
+        // We add all the variable sensors in the detected positions to perform inference questions after
         for (int i = 0; i < detects.length(); i++) {
-            if (Character.getNumericValue(detects.charAt(i)) == 1) {
-                for (int j = 0; j < 3; j++) {
-                    for (Position pos : allStates) {
-                        if (pos.x == x + 1 && pos.y == y - 1 + j) {
-                            futureKnowledge.add(pos);
-                            break;
-                        }
-                    }
-                }
-            } else if (Character.getNumericValue(detects.charAt(i)) == 2) {
-                for (int ii = 0; ii < 3; ii++) {
-                    for (Position pos : allStates) {
-                        if (pos.x == x - 1 + ii && pos.y == y + 1) {
-                            futureKnowledge.add(pos);
-                            break;
-                        }
-                    }
-                }
-            } else if (Character.getNumericValue(detects.charAt(i)) == 3) {
-                for (int j = 0; j < 3; j++) {
-                    for (Position pos : allStates) {
-                        if (pos.x == x - 1 && pos.y == y - 1 + j) {
-                            futureKnowledge.add(pos);
-                            break;
-                        }
-                    }
-                }
-            } else if (Character.getNumericValue(detects.charAt(i)) == 4) {
-                for (int ii = 0; ii < 3; ii++) {
-                    for (Position pos : allStates) {
-                        if (pos.x == x - 1 + ii && pos.y == y - 1) {
-                            futureKnowledge.add(pos);
-                            break;
-                        }
-                    }
-                }
-            } else if (Character.getNumericValue(detects.charAt(i)) == 5) {
-                for (Position pos : allStates) {
-                    if (pos.x == x && pos.y == y) {
-                        futureKnowledge.add(pos);
-                        break;
-                    }
-                }
-            }
+            int variableSensor = coordToLineal(x, y, DetectorOffset * (int) detects.charAt(i));
+            Evidences.add(variableSensor);
         }
-        if (!detects.contains("1") || !detects.contains("2")) {
-            if (EnvAgent.withinLimits(x + 1, y + 1)) {
-                futureKnowledge.add(new Position(x + 1, y + 1));
-            }
-        }
-        if (!detects.contains("1") || !detects.contains("4")) {
-            if (EnvAgent.withinLimits(x + 1, y - 1)) {
-                futureKnowledge.add(new Position(x + 1, y - 1));
-            }
-        }
-        if (!detects.contains("3") || !detects.contains("2")) {
-            if (EnvAgent.withinLimits(x - 1, y + 1)) {
-                futureKnowledge.add(new Position(x - 1, y + 1));
-            }
-        }
-        if (!detects.contains("3") || !detects.contains("4")) {
-            if (EnvAgent.withinLimits(x - 1, y - 1)) {
-                futureKnowledge.add(new Position(x - 1, y - 1));
-            }
-        }
+
+        //TODO
         //Impossibles es les posicions on SEGUR que no hi ha sobre
-        for (Position pos : futureKnowledge) {
+        /***for (Position pos : futureKnowledge) {
             int variableEnFutur = coordToLineal(pos.x, pos.y, EnvelopeFutureOffset);
             VecInt clausula = new VecInt();
             clausula.insertFirst(-variableEnFutur); // -e x,y t+1
             solver.addClause(clausula);
-        }
+        }***/
     }
 
     /**
@@ -427,6 +349,7 @@ public class EnvelopeFinder {
                 }
             }
         }
+        //TODO
     }
 
     /**
@@ -435,7 +358,7 @@ public class EnvelopeFinder {
      *
      * @return returns the solver object where the formula has been stored
      **/
-    public ISolver buildGamma() {
+    public ISolver buildGamma() throws ContradictionException {
         //Number of positions in the map, that can have envelopes or not
         int totalNumVariables = this.WorldLinealDim;
 
@@ -448,6 +371,90 @@ public class EnvelopeFinder {
         // This variable is used to generate, in a particular sequential order,
         // the variable indentifiers of all the variables
         actualLiteral = 1;
+
+        // call here functions to add the different sets of clauses
+        // of Gamma to the solver object
+        //
+        // EXAMPLE of building a clause:
+        // VecInt Clause = new VecInt();
+        //  insert a literal into the clause:
+        //    Clause.insertFirst(actualLiteral);
+        //
+        //  Insert the clause into the formula:
+        //  solver.addClause(Clause);
+
+        int[] futurePossibleEnvelopes = new int[WorldLinealDim];
+        int[] pastPossibleEnvelopes = new int[WorldLinealDim];
+        for (int x = 0; x < WorldDim; x++) {
+            for (int y = 0; y < WorldDim; y++) {
+                futurePossibleEnvelopes[x * WorldDim + y] = coordToLineal(x, y, EnvelopeFutureOffset);
+                pastPossibleEnvelopes [x * WorldDim + y] = coordToLineal(x, y, EnvelopePastOffset);
+            }
+        }
+        VecInt futureAllPosibleEnvelopes = new VecInt(futurePossibleEnvelopes);
+        VecInt pastAllPosibleEnvelopes = new VecInt(pastPossibleEnvelopes);
+
+        solver.addClause(futureAllPosibleEnvelopes);
+        solver.addClause(pastAllPosibleEnvelopes);
+
+        for (int x = 0; x < WorldDim; x++) {
+            for (int y = 0; y < WorldDim; y++) {
+                if () {
+                    int notPossiblePosition = coordToLineal(x + 1, y, EnvelopeFutureOffset);
+                    VecInt notPossible = new VecInt();
+                    notPossible.insertFirst(-(notPossiblePosition));
+                    futureToPast.add(notPossible);
+                }
+                if () {
+                    int notPossiblePosition = coordToLineal(x, y + 1, EnvelopeFutureOffset);
+                    VecInt notPossible = new VecInt();
+                    notPossible.insertFirst(-(notPossiblePosition));
+                    futureToPast.add(notPossible);
+                }
+                if () {
+                    int notPossiblePosition = coordToLineal(x - 1, y, EnvelopeFutureOffset);
+                    VecInt notPossible = new VecInt();
+                    notPossible.insertFirst(-(notPossiblePosition));
+                    futureToPast.add(notPossible);
+                }
+                if () {
+                    int notPossiblePosition = coordToLineal(x, y - 1, EnvelopeFutureOffset);
+                    VecInt notPossible = new VecInt();
+                    notPossible.insertFirst(-(notPossiblePosition));
+                    futureToPast.add(notPossible);
+                }
+                if () {
+                    int notPossiblePosition = coordToLineal(x, y, EnvelopeFutureOffset);
+                    VecInt notPossible = new VecInt();
+                    notPossible.insertFirst(-(notPossiblePosition));
+                    futureToPast.add(notPossible);
+                }
+                if () {
+                    int notPossiblePosition = coordToLineal(x + 1, y + 1, EnvelopeFutureOffset);
+                    VecInt notPossible = new VecInt();
+                    notPossible.insertFirst(-(notPossiblePosition));
+                    futureToPast.add(notPossible);
+                }
+                if () {
+                    int notPossiblePosition = coordToLineal(x - 1, y + 1, EnvelopeFutureOffset);
+                    VecInt notPossible = new VecInt();
+                    notPossible.insertFirst(-(notPossiblePosition));
+                    futureToPast.add(notPossible);
+                }
+                if () {
+                    int notPossiblePosition = coordToLineal(x - 1, y - 1, EnvelopeFutureOffset);
+                    VecInt notPossible = new VecInt();
+                    notPossible.insertFirst(-(notPossiblePosition));
+                    futureToPast.add(notPossible);
+                }
+                if () {
+                    int notPossiblePosition = coordToLineal(x + 1, y - 1, EnvelopeFutureOffset);
+                    VecInt notPossible = new VecInt();
+                    notPossible.insertFirst(-(notPossiblePosition));
+                    futureToPast.add(notPossible);
+                }
+            }
+        }
 
         return solver;
     }

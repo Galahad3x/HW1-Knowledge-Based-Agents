@@ -40,7 +40,7 @@ public class EnvelopeFinderTest {
      **/
     ArrayList<EFState> states;
 
-    public void setUp(String envelopesFile, String stepsFile, String statesFile, int wDim, int numStates) {
+    public void setUp(String envelopesFile, String stepsFile, String statesFile, int wDim, int numStates) throws ContradictionException {
         eAgent = new EnvelopeFinder(wDim);
         env = new EnvelopeWorldEnv(wDim, envelopesFile);
         eAgent.setEnvironment(env);
@@ -124,6 +124,7 @@ public class EnvelopeFinderTest {
      * This function should run the sequence of steps stored in the file fileSteps,
      * but only up to numSteps steps.
      **/
+    @Test
     public void testMakeSeqOfSteps()
             throws ContradictionException, TimeoutException {
         // You should make TreasureFinder and TreasureWorldEnv objects to test.
