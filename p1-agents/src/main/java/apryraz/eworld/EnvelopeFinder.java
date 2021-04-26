@@ -381,24 +381,6 @@ public class EnvelopeFinder {
         //  Insert the clause into the formula:
         //  solver.addClause(Clause);
 
-<<<<<<< Updated upstream
-        VecInt futureAllPossibleEnvelopes = new VecInt();
-        VecInt pastAllPossibleEnvelopes = new VecInt();
-
-
-        for (int x = 1; x < WorldDim + 1; x++) {
-            for (int y = 1; y < WorldDim + 1; y++) {
-                futureAllPossibleEnvelopes.insertFirst(coordToLineal(x, y, EnvelopeFutureOffset));
-                pastAllPossibleEnvelopes.insertFirst(coordToLineal(x, y, EnvelopePastOffset));
-            }
-        }
-
-        solver.addClause(futureAllPossibleEnvelopes);
-        solver.addClause(pastAllPossibleEnvelopes);
-
-
-=======
->>>>>>> Stashed changes
         for (int x = 1; x < WorldDim + 1; x++) {
             for (int y = 1; y < WorldDim + 1; y++) {
 
