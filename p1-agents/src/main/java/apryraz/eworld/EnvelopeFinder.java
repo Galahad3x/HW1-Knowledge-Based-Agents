@@ -292,13 +292,105 @@ public class EnvelopeFinder {
         // formula
 
         // We add all the variable sensors in the detected positions to perform inference questions after
-        for (int i = 0; i < detects.length(); i++) {
-            int variableSensor = coordToLineal(x, y, DetectorOffset * (int) detects.charAt(i));
-            Evidences.insertFirst(variableSensor);
+
+        ISolver sensorSolver = S;
+
+        VecInt futureAllPossibleEnvelopes = new VecInt();
+        VecInt pastAllPossibleEnvelopes = new VecInt();
+
+        for (int x = 1; x < WorldDim + 1; x++) {
+            for (int y = 1; y < WorldDim + 1; y++) {
+                futureAllPossibleEnvelopes.insertFirst(coordToLineal(x, y, EnvelopeFutureOffset));
+                pastAllPossibleEnvelopes.insertFirst(coordToLineal(x, y, EnvelopeFutureOffset));
+            }
+        }
+
+        sensorSolver.addClause(futureAllPossibleEnvelopes);
+        sensorSolver.addClause(pastAllPossibleEnvelopes);
+
+        int sensor1 = coordToLineal(x, y, DetectorOffset);
+        int sensor2 = coordToLineal(x, y, DetectorOffset * 2);
+        int sensor3 = coordToLineal(x, y, DetectorOffset * 3);
+        int sensor4 = coordToLineal(x, y, DetectorOffset * 4);
+        int sensor5 = coordToLineal(x, y, DetectorOffset * 5);
+
+        if (EnvAgent.withinLimits(x + 1, y)) {
+            VecInt clauseS1 = new VecInt(sensor1, -coordToLineal(x + 1, y, EnvelopeFutureOffset));
+            solver.addClause(clauseS1);
+        }
+        if (EnvAgent.withinLimits(x, y + 1)) {
+            VecInt clauseS2 = new VecInt(sensor2, -coordToLineal(x, y + 1, EnvelopeFutureOffset));
+            solver.addClause(clauseS2);
+        }
+        if (EnvAgent.withinLimits(x - 1, y)) {
+            VecInt clauseS3 = new VecInt(sensor3, -coordToLineal(x - 1, y, EnvelopeFutureOffset));
+            solver.addClause(clauseS3);
+        }
+        if (EnvAgent.withinLimits(x, y - 1)) {
+            VecInt clauseS4 = new VecInt(sensor4, -coordToLineal(x, y - 1, EnvelopeFutureOffset));
+            solver.addClause(clauseS4);
+        }
+        if (EnvAgent.withinLimits(x, y)) {
+            VecInt clauseS5 = new VecInt(sensor5, -coordToLineal(x, y, EnvelopeFutureOffset));
+            solver.addClause(clauseS5);
+        }
+
+        // Corners
+        if (EnvAgent.withinLimits(x + 1, y + 1)) {
+            VecInt clauseS1 = new VecInt(sensor1, -coordToLineal(x + 1, y + 1, EnvelopeFutureOffset));
+            VecInt clauseS2 = new VecInt(sensor2, -coordToLineal(x + 1, y + 1, EnvelopeFutureOffset));
+
+            VecInt clause = new VecInt();
+            clause.insertFirst(-sensor1);
+            clause.insertFirst(-sensor2);
+            clause.insertFirst(coordToLineal(x + 1, y + 1, EnvelopeFutureOffset));
+
+            solver.addClause(clauseS1);
+            solver.addClause(clauseS2);
+            solver.addClause(clause);
+        }
+        if (EnvAgent.withinLimits(x - 1, y + 1)) {
+            VecInt clauseS2 = new VecInt(sensor2, -coordToLineal(x - 1, y + 1, EnvelopeFutureOffset));
+            VecInt clauseS3 = new VecInt(sensor3, -coordToLineal(x - 1, y + 1, EnvelopeFutureOffset));
+
+            VecInt clause = new VecInt();
+            clause.insertFirst(-sensor2);
+            clause.insertFirst(-sensor3);
+            clause.insertFirst(coordToLineal(x - 1, y + 1, EnvelopeFutureOffset));
+
+            solver.addClause(clauseS2);
+            solver.addClause(clauseS3);
+            solver.addClause(clause);
+        }
+        if (EnvAgent.withinLimits(x - 1, y - 1)) {
+            VecInt clauseS3 = new VecInt(sensor3, -coordToLineal(x - 1, y - 1, EnvelopeFutureOffset));
+            VecInt clauseS4 = new VecInt(sensor4, -coordToLineal(x - 1, y + 1, EnvelopeFutureOffset));
+
+            VecInt clause = new VecInt();
+            clause.insertFirst(-sensor3);
+            clause.insertFirst(-sensor4);
+            clause.insertFirst(coordToLineal(x - 1, y - 1, EnvelopeFutureOffset));
+
+            solver.addClause(clauseS3);
+            solver.addClause(clauseS4);
+            solver.addClause(clause);
+        }
+        if (EnvAgent.withinLimits(x + 1, y - 1)) {
+            VecInt clauseS4 = new VecInt(sensor4, -coordToLineal(x + 1, y - 1, EnvelopeFutureOffset));
+            VecInt clauseS1 = new VecInt(sensor1, -coordToLineal(x - 1, y + 1, EnvelopeFutureOffset));
+
+            VecInt clause = new VecInt();
+            clause.insertFirst(-sensor4);
+            clause.insertFirst(-sensor1);
+            clause.insertFirst(coordToLineal(x + 1, y - 1, EnvelopeFutureOffset));
+
+            solver.addClause(clauseS4);
+            solver.addClause(clauseS1);
+            solver.addClause(clause);
         }
 
         System.out.println(solver.isSatisfiable(Evidences));
-        
+
         if (solver.isSatisfiable(Evidences)) {
             int[] model = solver.findModel(Evidences);
             System.out.println(Arrays.toString(model));
