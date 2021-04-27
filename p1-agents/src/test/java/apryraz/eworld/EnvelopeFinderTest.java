@@ -124,7 +124,6 @@ public class EnvelopeFinderTest {
      * This function should run the sequence of steps stored in the file fileSteps,
      * but only up to numSteps steps.
      **/
-    @Test
     public void testMakeSeqOfSteps()
             throws ContradictionException, TimeoutException {
         // You should make TreasureFinder and TreasureWorldEnv objects to test.
